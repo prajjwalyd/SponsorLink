@@ -1,15 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IESCP</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container">
-        <h1 class="mt-5">Welcome to IESCP!</h1>
-        <p class="lead">Influencer Engagement and Sponsorship Coordination Platform</p>
-    </div>
-</body>
-</html>
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1 class="text-center">Welcome to the Influencer Engagement and Sponsorship Coordination Platform</h1>
+<div class="text-center">
+    <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+    <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
+</div>
+{% endblock %}
