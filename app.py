@@ -23,9 +23,12 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), nullable=False)  # 'admin', 'sponsor', 'influencer'
     # Additional fields for different roles
+
+    # Sponsor fields
     company_name = db.Column(db.String(100))
     industry = db.Column(db.String(100))
     budget = db.Column(db.Integer)
+    # Influencer fields
     category = db.Column(db.String(100))
     niche = db.Column(db.String(100))
     reach = db.Column(db.Integer)
@@ -83,6 +86,18 @@ class RegistrationForm(FlaskForm):
 def home():
     return render_template('index.html')
 
+# @app.route('/')
+# def index():
+#     if current_user.is_authenticated:
+#         if current_user.role == 'admin':
+#             return redirect(url_for('admin_dashboard'))
+#         elif current_user.role == 'sponsor':
+#             return redirect(url_for('sponsor_dashboard'))
+#         elif current_user.role == 'influencer':
+#             return redirect(url_for('influencer_dashboard'))
+#     return render_template('index.html')
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -90,11 +105,19 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
+            flash('Logged in successfully!', 'success')
+            if user.role == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            elif user.role == 'sponsor':
+                return redirect(url_for('sponsor_dashboard'))
+            elif user.role == 'influencer':
+                return redirect(url_for('influencer_dashboard'))
+            else:
+                return redirect(url_for('index'))
         else:
-            flash('Login Unsuccessful. Please check username and password', 'danger')
+            flash('Invalid username or password', 'danger')
     return render_template('login.html', form=form)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -116,10 +139,38 @@ def logout():
     flash('You have been logged out.', 'success')
     return redirect(url_for('home'))
 
-@app.route('/dashboard')
+# @app.route('/dashboard')
+# @login_required
+# def dashboard():
+#     return render_template('dashboard.html', name=current_user.username)
+
+@app.route('/admin/dashboard')
 @login_required
-def dashboard():
-    return render_template('dashboard.html', name=current_user.username)
+def admin_dashboard():
+    if current_user.role != 'admin':
+        flash('Access unauthorized!', 'danger')
+        return redirect(url_for('index'))
+    # Here you would add logic to gather statistics for the admin
+    return render_template('admin_dashboard.html')
+
+@app.route('/sponsor/dashboard')
+@login_required
+def sponsor_dashboard():
+    if current_user.role != 'sponsor':
+        flash('Access unauthorized!', 'danger')
+        return redirect(url_for('index'))
+    # Logic to gather sponsor-specific data
+    return render_template('sponsor_dashboard.html')
+
+@app.route('/influencer/dashboard')
+@login_required
+def influencer_dashboard():
+    if current_user.role != 'influencer':
+        flash('Access unauthorized!', 'danger')
+        return redirect(url_for('index'))
+    # Logic to gather influencer-specific data
+    return render_template('influencer_dashboard.html')
+
 
 def create_admin_user():
     admin_username = 'admin'
