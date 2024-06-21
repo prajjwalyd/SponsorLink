@@ -121,7 +121,22 @@ def logout():
 def dashboard():
     return render_template('dashboard.html', name=current_user.username)
 
+def create_admin_user():
+    admin_username = 'admin'
+    admin_password = 'admin123'
+    admin_role = 'admin'
+    admin = User.query.filter_by(username=admin_username).first()
+    if not admin:
+        hashed_password = generate_password_hash(admin_password, method='scrypt')
+        admin = User(username=admin_username, password=hashed_password, role=admin_role)
+        db.session.add(admin)
+        db.session.commit()
+        print('Admin user created with username: admin and password: adminpass')
+    else:
+        print('Admin user already exists.')
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        create_admin_user()
     app.run(debug=True)
