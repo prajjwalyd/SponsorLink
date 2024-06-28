@@ -66,7 +66,7 @@ class AdRequest(db.Model):
     requirements = db.Column(db.Text)
     payment_amount = db.Column(db.Integer)
     negotiation_comment = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(10), default='Pending')  # 'Pending', 'Accepted', 'Rejected'
+    status = db.Column(db.String(20), nullable=False, default='Requested')
 
     def __repr__(self):
         return f'<AdRequest {self.id}>'
@@ -106,7 +106,12 @@ class AdRequestForm(FlaskForm):
     influencer_id = SelectField('Influencer', coerce=int, validators=[DataRequired()])
     requirements = TextAreaField('Requirements', validators=[DataRequired()])
     payment_amount = FloatField('Payment Amount', validators=[DataRequired()])
-    status = SelectField('Status', choices=[('Pending', 'Pending'), ('Accepted', 'Accepted'), ('Negotiated', 'Negotiated'), ('Rejected', 'Rejected')], validators=[DataRequired()])
+    status = SelectField('Status', choices=[
+        ('Requested', 'Requested'),
+        ('Accepted', 'Accepted'),
+        ('Rejected', 'Rejected'),
+        ('Negotiated', 'Negotiated')
+    ], validators=[DataRequired()])
     negotiation_comment = TextAreaField('Negotiation Comment', validators=[Optional()])
     submit = SubmitField('Save Ad Request')
 
@@ -205,8 +210,11 @@ def influencer_dashboard():
     if current_user.role != 'influencer':
         flash('Access unauthorized!', 'danger')
         return redirect(url_for('index'))
-    ad_requests = AdRequest.query.filter_by(influencer_id=current_user.id).all()
-    return render_template('influencer_dashboard.html', ad_requests=ad_requests)
+    requested_ads = AdRequest.query.filter_by(influencer_id=current_user.id, status='Requested').all()
+    current_ads = AdRequest.query.filter_by(influencer_id=current_user.id, status='Accepted').all()
+    negotiated_ads = AdRequest.query.filter_by(influencer_id=current_user.id, status='Negotiated').all()
+    return render_template('influencer_dashboard.html', current_ads=current_ads, negotiated_ads=negotiated_ads, requested_ads=requested_ads)
+
 
 @app.route('/campaign/new', methods=['GET', 'POST'])
 @login_required
@@ -360,27 +368,25 @@ def reject_ad_request(ad_request_id):
     flash('Ad request rejected!', 'danger')
     return redirect(url_for('influencer_dashboard'))
 
-@app.route('/ad_request/<int:ad_request_id>/negotiate', methods=['GET', 'POST'])
+@app.route('/negotiate_ad_request/<int:ad_request_id>', methods=['GET', 'POST'])
 @login_required
 def negotiate_ad_request(ad_request_id):
     ad_request = AdRequest.query.get_or_404(ad_request_id)
-    if ad_request.influencer != current_user:
-        flash('Access unauthorized!', 'danger')
-        return redirect(url_for('index'))
-    form = AdRequestForm()
+    form = AdRequestForm(obj=ad_request)
+    form.campaign_id.choices = [(ad_request.campaign_id, ad_request.campaign.name)]
+    form.influencer_id.choices = [(ad_request.influencer_id, ad_request.influencer.username)]
+
     if form.validate_on_submit():
         ad_request.requirements = form.requirements.data
         ad_request.payment_amount = form.payment_amount.data
         ad_request.negotiation_comment = form.negotiation_comment.data
         ad_request.status = 'Negotiated'
         db.session.commit()
-        flash('Ad request sent for negotiation!', 'success')
+        flash('Ad request has been negotiated.', 'success')
         return redirect(url_for('influencer_dashboard'))
-    elif request.method == 'GET':
-        form.requirements.data = ad_request.requirements
-        form.payment_amount.data = ad_request.payment_amount
-        form.negotiation_comment.data = ad_request.negotiation_comment
-    return render_template('negotiate_ad_request.html', form=form, legend='Negotiate Ad Request')
+    return render_template('negotiate_ad_request.html', legend='Negotiate Ad Request', form=form)
+
+
 
 
 
