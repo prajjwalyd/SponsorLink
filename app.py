@@ -102,7 +102,7 @@ class AdRequestForm(FlaskForm):
     campaign_id = SelectField('Campaign', coerce=int, validators=[DataRequired()])
     influencer_id = SelectField('Influencer', coerce=int, validators=[DataRequired()])
     requirements = TextAreaField('Requirements', validators=[DataRequired()])
-    payment_amount = DecimalField('Payment Amount', validators=[DataRequired()])
+    payment_amount = FloatField('Payment Amount', validators=[DataRequired()])
     status = SelectField('Status', choices=[('Pending', 'Pending'), ('Accepted', 'Accepted'), ('Rejected', 'Rejected')], validators=[DataRequired()])
     submit = SubmitField('Save Ad Request')
 
