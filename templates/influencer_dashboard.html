@@ -3,16 +3,34 @@
 {% block content %}
 <h1 class="text-center">Influencer Dashboard</h1>
 <div class="row">
-    <div class="col-md-12">
-        <h3>Ad Requests</h3>
+    <div class="col-md-6">
+        <h3>Requested Ads</h3>
         <ul>
-            {% for ad_request in current_user.ad_requests %}
-            <li>
-                Campaign: {{ ad_request.campaign.name }} - {{ ad_request.requirements }} - {{ ad_request.payment_amount }} - {{ ad_request.status }}
-                <a href="{{ url_for('accept_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-success btn-sm">Accept</a>
-                <a href="{{ url_for('reject_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-danger btn-sm">Reject</a>
-                <a href="{{ url_for('negotiate_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-warning btn-sm">Negotiate</a>
-            </li>
+            {% for ad_request in ad_requests %}
+                {% if ad_request.status == 'Pending' %}
+                <li>
+                    Campaign: {{ ad_request.campaign.name }} - {{ ad_request.requirements }} - {{ ad_request.payment_amount }} - {{ ad_request.status }}
+                    <form method="POST" action="{{ url_for('accept_ad_request', ad_request_id=ad_request.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('reject_ad_request', ad_request_id=ad_request.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                    </form>
+                    <a href="{{ url_for('negotiate_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-warning btn-sm">Negotiate</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <h3>Current Ads</h3>
+        <ul>
+            {% for ad_request in ad_requests %}
+                {% if ad_request.status == 'Accepted' %}
+                <li>
+                    Campaign: {{ ad_request.campaign.name }} - {{ ad_request.requirements }} - {{ ad_request.payment_amount }} - {{ ad_request.status }}
+                </li>
+                {% endif %}
             {% endfor %}
         </ul>
     </div>

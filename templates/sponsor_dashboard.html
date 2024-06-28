@@ -13,26 +13,25 @@
                 <form method="POST" action="{{ url_for('delete_campaign', campaign_id=campaign.id) }}" style="display:inline;">
                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                 </form>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('create_ad_request') }}" class="btn btn-primary btn-sm mb-3">Create New Ad Request</a>
+                    </li>
+                    {% for ad_request in campaign.ad_requests %}
+                    <li>
+                        {{ ad_request.influencer.username }} - {{ ad_request.requirements }} - {{ ad_request.payment_amount }} - {{ ad_request.status }}
+                        <a href="{{ url_for('update_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-secondary btn-sm">Edit</a>
+                        <form method="POST" action="{{ url_for('delete_ad_request', ad_request_id=ad_request.id) }}" style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li>No ad requests found.</li>
+                    {% endfor %}
+                </ul>
             </li>
             {% else %}
             <li>No campaigns found.</li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="col-md-6">
-        <h3>Ad Requests</h3>
-        <a href="{{ url_for('create_ad_request') }}" class="btn btn-primary mb-3">Create New Ad Request</a>
-        <ul>
-            {% for ad_request in ad_requests %}
-            <li>
-                {{ ad_request.influencer.username }} - {{ ad_request.requirements }} - {{ ad_request.payment_amount }} - {{ ad_request.status }}
-                <a href="{{ url_for('update_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-secondary btn-sm">Edit</a>
-                <form method="POST" action="{{ url_for('delete_ad_request', ad_request_id=ad_request.id) }}" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                </form>
-            </li>
-            {% else %}
-            <li>No ad requests found.</li>
             {% endfor %}
         </ul>
     </div>

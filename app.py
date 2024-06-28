@@ -6,7 +6,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, DecimalField, DateField, FloatField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, DateField, FloatField
+from wtforms.validators import Optional
 from wtforms.validators import DataRequired, Length, EqualTo
 
 # Initialize the app and configurations
@@ -14,6 +15,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -63,6 +65,7 @@ class AdRequest(db.Model):
     messages = db.Column(db.Text)
     requirements = db.Column(db.Text)
     payment_amount = db.Column(db.Integer)
+    negotiation_comment = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(10), default='Pending')  # 'Pending', 'Accepted', 'Rejected'
 
     def __repr__(self):
@@ -103,7 +106,8 @@ class AdRequestForm(FlaskForm):
     influencer_id = SelectField('Influencer', coerce=int, validators=[DataRequired()])
     requirements = TextAreaField('Requirements', validators=[DataRequired()])
     payment_amount = FloatField('Payment Amount', validators=[DataRequired()])
-    status = SelectField('Status', choices=[('Pending', 'Pending'), ('Accepted', 'Accepted'), ('Rejected', 'Rejected')], validators=[DataRequired()])
+    status = SelectField('Status', choices=[('Pending', 'Pending'), ('Accepted', 'Accepted'), ('Negotiated', 'Negotiated'), ('Rejected', 'Rejected')], validators=[DataRequired()])
+    negotiation_comment = TextAreaField('Negotiation Comment', validators=[Optional()])
     submit = SubmitField('Save Ad Request')
 
 
@@ -195,14 +199,14 @@ def sponsor_dashboard():
     return render_template('sponsor_dashboard.html', campaigns=campaigns, ad_requests=ad_requests)
 
 
-@app.route('/influencer/dashboard')
+@app.route('/influencer_dashboard')
 @login_required
 def influencer_dashboard():
     if current_user.role != 'influencer':
         flash('Access unauthorized!', 'danger')
         return redirect(url_for('index'))
-    # Logic to gather influencer-specific data
-    return render_template('influencer_dashboard.html')
+    ad_requests = AdRequest.query.filter_by(influencer_id=current_user.id).all()
+    return render_template('influencer_dashboard.html', ad_requests=ad_requests)
 
 @app.route('/campaign/new', methods=['GET', 'POST'])
 @login_required
@@ -330,6 +334,8 @@ def delete_ad_request(ad_request_id):
     flash('Ad request deleted successfully!', 'success')
     return redirect(url_for('sponsor_dashboard'))
 
+
+
 @app.route('/ad_request/<int:ad_request_id>/accept', methods=['POST'])
 @login_required
 def accept_ad_request(ad_request_id):
@@ -365,15 +371,16 @@ def negotiate_ad_request(ad_request_id):
     if form.validate_on_submit():
         ad_request.requirements = form.requirements.data
         ad_request.payment_amount = form.payment_amount.data
-        ad_request.status = 'Pending'
+        ad_request.negotiation_comment = form.negotiation_comment.data
+        ad_request.status = 'Negotiated'
         db.session.commit()
         flash('Ad request sent for negotiation!', 'success')
         return redirect(url_for('influencer_dashboard'))
     elif request.method == 'GET':
         form.requirements.data = ad_request.requirements
         form.payment_amount.data = ad_request.payment_amount
+        form.negotiation_comment.data = ad_request.negotiation_comment
     return render_template('negotiate_ad_request.html', form=form, legend='Negotiate Ad Request')
-
 
 
 
