@@ -1,37 +1,43 @@
 {% extends "layout.html" %}
 {% block title %}Sponsor Dashboard{% endblock %}
 {% block content %}
-<h1 class="text-center">Sponsor Dashboard</h1>
+<h1 class="text-center mb-4">Sponsor Dashboard</h1>
+
 <div class="row">
     <div class="col-md-6">
         <h3>Your Campaigns</h3>
         <a href="{{ url_for('create_campaign') }}" class="btn btn-primary mb-3">Create New Campaign</a>
-        <ul>
+        <ul class="list-group">
             {% for campaign in campaigns %}
-            <li>
-                <a href="{{ url_for('update_campaign', campaign_id=campaign.id) }}">{{ campaign.name }}</a>
-                <form method="POST" action="{{ url_for('delete_campaign', campaign_id=campaign.id) }}" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                </form>
-                <ul>
-                    <li>
-                        <a href="{{ url_for('create_ad_request') }}" class="btn btn-primary btn-sm mb-3">Create New Ad Request</a>
-                    </li>
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{{ url_for('update_campaign', campaign_id=campaign.id) }}">{{ campaign.name }}</a>
+                    <form method="POST" action="{{ url_for('delete_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+                <a href="{{ url_for('create_ad_request') }}" class="btn btn-primary btn-sm mt-2 mb-2">Create New Ad Request</a>
+                <ul class="list-group">
                     {% for ad_request in campaign.ad_requests %}
-                    <li>
-                        {{ ad_request.influencer.username }} - {{ ad_request.requirements }} - {{ ad_request.payment_amount }} - {{ ad_request.status }}
-                        <a href="{{ url_for('update_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-secondary btn-sm">Edit</a>
-                        <form method="POST" action="{{ url_for('delete_ad_request', ad_request_id=ad_request.id) }}" style="display:inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
+                    <li class="list-group-item">
+                        {{ ad_request.influencer.username }} - {{ ad_request.requirements }} - {{ ad_request.payment_amount }} 
+                        <span class="badge {% if ad_request.status == 'Accepted' %}bg-success{% elif ad_request.status == 'Rejected' %}bg-danger{% elif ad_request.status == 'Requested' %}bg-light{% elif ad_request.status == 'Negotiated' %}bg-warning text-dark{% endif %}">
+                            {{ ad_request.status }}
+                        </span>
+                        <div class="mt-2">
+                            <a href="{{ url_for('update_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-secondary btn-sm">Edit</a>
+                            <form method="POST" action="{{ url_for('delete_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
                     </li>
                     {% else %}
-                    <li>No ad requests found.</li>
+                    <li class="list-group-item">No ad requests found.</li>
                     {% endfor %}
                 </ul>
             </li>
             {% else %}
-            <li>No campaigns found.</li>
+            <li class="list-group-item">No campaigns found.</li>
             {% endfor %}
         </ul>
     </div>
