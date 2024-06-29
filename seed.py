@@ -1,20 +1,41 @@
-from app import app, db
-from models import User, Campaign
+from app import app, db, User, Campaign, AdRequest
+from werkzeug.security import generate_password_hash
 
-with app.app_context():
-    # Create some users
-    admin = User(username='admin', password='adminpass', role='admin')
-    sponsor = User(username='sponsor1', password='sponsorpass', role='sponsor', company_name='Company A', industry='Tech', budget=10000)
-    influencer = User(username='influencer1', password='influencerpass', role='influencer', category='Tech', niche='Gadgets', reach=50000)
+def seed_data():
+    users = [
+        User(username='sponsor1', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='TechCorp', industry='Technology', budget=10000),
+        User(username='sponsor2', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='HealthPlus', industry='Healthcare', budget=15000),
+        User(username='sponsor3', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='EcoHome', industry='Home Goods', budget=12000),
+        User(username='influencer1', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Fitness', niche='Yoga', reach=5000),
+        User(username='influencer2', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Food', niche='Vegan', reach=3000),
+        User(username='influencer3', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Travel', niche='Adventure', reach=7000),
+        User(username='influencer4', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Fashion', niche='Streetwear', reach=6000)
+    ]
 
-    db.session.add(admin)
-    db.session.add(sponsor)
-    db.session.add(influencer)
+    campaigns = [
+        Campaign(name='TechLaunch', description='Launch of new tech gadget', budget=5000, owner_id=2, visibility='public'),
+        Campaign(name='Wellness Week', description='Health and wellness campaign', budget=8000, owner_id=3, visibility='private'),
+        Campaign(name='EcoHome Challenge', description='Promote sustainable living products', budget=7000, owner_id=3, visibility='public'),
+        Campaign(name='Fashion Fiesta', description='Streetwear fashion promotion', budget=4000, owner_id=4, visibility='public')
+    ]
+
+    ad_requests = [
+        AdRequest(campaign_id=1, influencer_id=5, requirements='Promote on Instagram', payment_amount=300, status='Requested'),
+        AdRequest(campaign_id=1, influencer_id=6, requirements='Write a blog post', payment_amount=200, status='Accepted'),
+        AdRequest(campaign_id=2, influencer_id=6, requirements='Create a YouTube video', payment_amount=500, status='Negotiated', negotiation_comment='Need higher payment'),
+        AdRequest(campaign_id=3, influencer_id=7, requirements='Instagram stories and post', payment_amount=350, status='Requested'),
+        AdRequest(campaign_id=3, influencer_id=7, requirements='Create a travel vlog', payment_amount=400, status='Accepted'),
+        AdRequest(campaign_id=4, influencer_id=8, requirements='Fashion haul video', payment_amount=250, status='Requested'),
+        AdRequest(campaign_id=4, influencer_id=8, requirements='Streetwear blog post', payment_amount=150, status='Requested'),
+        AdRequest(campaign_id=2, influencer_id=8, requirements='Fashion advice video', payment_amount=300, status='Requested')
+    ]
+
+    db.session.add_all(users)
+    db.session.add_all(campaigns)
+    db.session.add_all(ad_requests)
     db.session.commit()
+    print("Database seeded with sample data.")
 
-    # Create a campaign
-    campaign = Campaign(name='Tech Campaign', description='Promote new tech products', budget=5000, visibility='public', sponsor_id=sponsor.id)
-    db.session.add(campaign)
-    db.session.commit()
-    
-    print("Database seeded successfully.")
+if __name__ == '__main__':
+    with app.app_context():
+        seed_data()

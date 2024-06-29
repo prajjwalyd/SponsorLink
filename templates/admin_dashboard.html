@@ -1,5 +1,93 @@
 {% extends "layout.html" %}
 {% block title %}Admin Dashboard{% endblock %}
 {% block content %}
-<h1 class="text-center">Admin Dashboard</h1>
+<h1 class="text-center mb-4">Admin Dashboard</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <h3>Statistics</h3>
+        <ul class="list-group mb-4">
+            <li class="list-group-item">Active Users: {{ active_users }}</li>
+            <li class="list-group-item">Total Campaigns: {{ total_campaigns }}</li>
+            <li class="list-group-item">Public Campaigns: {{ public_campaigns }}</li>
+            <li class="list-group-item">Private Campaigns: {{ private_campaigns }}</li>
+            <li class="list-group-item">Total Ad Requests: {{ total_ad_requests }}</li>
+            <li class="list-group-item">Accepted: {{ accepted_requests }}</li>
+            <li class="list-group-item">Rejected: {{ rejected_requests }}</li>
+            <li class="list-group-item">Negotiated: {{ negotiated_requests }}</li>
+        </ul>
+    </div>
+
+    <div class="col-md-8">
+        <h3>All Users</h3>
+        <ul class="list-group mb-4">
+            {% for user in users %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ user.username }} ({{ user.email if user.email else '' }})
+                <div>
+                    <form method="POST" action="{{ url_for('flag_user', user_id=user.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-warning btn-sm">Flag</button>
+                    </form>
+                    {% if user.flagged %}
+                    <form method="POST" action="{{ url_for('remove_flag_user', user_id=user.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Unflag</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </li>
+            {% else %}
+            <li class="list-group-item">No users found.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>All Campaigns</h3>
+        <ul class="list-group mb-4">
+            {% for campaign in campaigns %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ campaign.name }} by {{ campaign.owner.username }}
+                <div>
+                    <form method="POST" action="{{ url_for('flag_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-warning btn-sm">Flag</button>
+                    </form>
+                    {% if campaign.flagged %}
+                    <form method="POST" action="{{ url_for('remove_flag_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Unflag</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </li>
+            {% else %}
+            <li class="list-group-item">No campaigns found.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Flagged Users</h3>
+        <ul class="list-group mb-4">
+            {% for flagged_user in flagged_users %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ flagged_user.username }} ({{ flagged_user.email if flagged_user.email else '' }})
+                <form method="POST" action="{{ url_for('remove_flag_user', user_id=flagged_user.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+            </li>
+            {% else %}
+            <li class="list-group-item">No flagged users.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Flagged Campaigns</h3>
+        <ul class="list-group mb-4">
+            {% for flagged_campaign in flagged_campaigns %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ flagged_campaign.name }} by {{ flagged_campaign.owner.username }}
+                <form method="POST" action="{{ url_for('remove_flag_campaign', campaign_id=flagged_campaign.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+            </li>
+            {% else %}
+            <li class="list-group-item">No flagged campaigns.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 {% endblock %}

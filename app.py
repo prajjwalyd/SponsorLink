@@ -7,8 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, DateField, FloatField
-from wtforms.validators import Optional
-from wtforms.validators import DataRequired, Length, EqualTo
+from wtforms.validators import DataRequired, Length, EqualTo, Optional
 
 # Initialize the app and configurations
 app = Flask(__name__)
@@ -18,17 +17,16 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-
 # Define User model
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), nullable=False)  # 'admin', 'sponsor', 'influencer'
+    flagged = db.Column(db.Boolean, default=False)  # Flag for inappropriate users
 
     campaigns = db.relationship('Campaign', backref='owner', lazy=True)
     ad_requests = db.relationship('AdRequest', backref='influencer', lazy=True)
-    # Additional fields for different roles
 
     # Sponsor fields
     company_name = db.Column(db.String(100))
@@ -52,6 +50,7 @@ class Campaign(db.Model):
     budget = db.Column(db.Float, nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     visibility = db.Column(db.String(10))  # 'public' or 'private'
+    flagged = db.Column(db.Boolean, default=False)
     ad_requests = db.relationship('AdRequest', backref='campaign', lazy=True)
 
     def __repr__(self):
@@ -121,21 +120,21 @@ class AdRequestForm(FlaskForm):
 
 
 
-# Define Routes
+# # Define Routes
+# @app.route('/')
+# def home():
+#     return render_template('index.html')
+
 @app.route('/')
 def home():
+    if current_user.is_authenticated:
+        if current_user.role == 'admin':
+            return redirect(url_for('admin_dashboard'))
+        elif current_user.role == 'sponsor':
+            return redirect(url_for('sponsor_dashboard'))
+        elif current_user.role == 'influencer':
+            return redirect(url_for('influencer_dashboard'))
     return render_template('index.html')
-
-# @app.route('/')
-# def index():
-#     if current_user.is_authenticated:
-#         if current_user.role == 'admin':
-#             return redirect(url_for('admin_dashboard'))
-#         elif current_user.role == 'sponsor':
-#             return redirect(url_for('sponsor_dashboard'))
-#         elif current_user.role == 'influencer':
-#             return redirect(url_for('influencer_dashboard'))
-#     return render_template('index.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -184,14 +183,33 @@ def logout():
 # def dashboard():
 #     return render_template('dashboard.html', name=current_user.username)
 
-@app.route('/admin/dashboard')
-@login_required
+@app.route('/admin_dashboard')
 def admin_dashboard():
-    if current_user.role != 'admin':
-        flash('Access unauthorized!', 'danger')
-        return redirect(url_for('index'))
-    # Here you would add logic to gather statistics for the admin
-    return render_template('admin_dashboard.html')
+    users = User.query.all()
+    campaigns = Campaign.query.all()
+    flagged_users = User.query.filter_by(flagged=True).all()
+    flagged_campaigns = Campaign.query.filter_by(flagged=True).all()
+
+    statistics = {
+        'active_users': User.query.count(),  # Fixed to show total users
+        'total_campaigns': Campaign.query.count(),
+        'public_campaigns': Campaign.query.filter_by(visibility='public').count(),
+        'private_campaigns': Campaign.query.filter_by(visibility='private').count(),
+        'total_ad_requests': AdRequest.query.count(),
+        'accepted_requests': AdRequest.query.filter_by(status='Accepted').count(),
+        'rejected_requests': AdRequest.query.filter_by(status='Rejected').count(),
+        'negotiated_requests': AdRequest.query.filter_by(status='Negotiated').count(),
+    }
+
+    return render_template(
+        'admin_dashboard.html',
+        users=users,
+        campaigns=campaigns,
+        flagged_users=flagged_users,
+        flagged_campaigns=flagged_campaigns,
+        **statistics
+    )
+
 
 @app.route('/sponsor_dashboard')
 @login_required
@@ -385,6 +403,39 @@ def negotiate_ad_request(ad_request_id):
         flash('Ad request has been negotiated.', 'success')
         return redirect(url_for('influencer_dashboard'))
     return render_template('negotiate_ad_request.html', legend='Negotiate Ad Request', form=form)
+
+
+
+
+
+@app.route('/flag_user/<int:user_id>', methods=['POST'])
+def flag_user(user_id):
+    user = User.query.get(user_id)
+    user.flagged = True
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/remove_flag_user/<int:user_id>', methods=['POST'])
+def remove_flag_user(user_id):
+    user = User.query.get(user_id)
+    user.flagged = False
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/flag_campaign/<int:campaign_id>', methods=['POST'])
+def flag_campaign(campaign_id):
+    campaign = Campaign.query.get(campaign_id)
+    campaign.flagged = True
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/remove_flag_campaign/<int:campaign_id>', methods=['POST'])
+def remove_flag_campaign(campaign_id):
+    campaign = Campaign.query.get(campaign_id)
+    campaign.flagged = False
+    db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
 
 
 
