@@ -1,5 +1,3 @@
-# app.py
-
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -33,10 +31,11 @@ class User(UserMixin, db.Model):
     industry = db.Column(db.String(100))
     budget = db.Column(db.Integer)
     # Influencer fields
-    category = db.Column(db.String(100))
+    category = db.Column(db.String(100)) # Health, Gaming, etc.
     niche = db.Column(db.String(100))
     reach = db.Column(db.Integer)
-
+    followers = db.Column(db.Integer)
+    platform = db.Column(db.String(10))
     def __repr__(self):
         return f'<User {self.username}>'
 
@@ -47,6 +46,7 @@ class Campaign(db.Model):
     description = db.Column(db.String(200))
     start_date = db.Column(db.DateTime, default=db.func.current_timestamp())
     end_date = db.Column(db.DateTime)
+    niche = db.Column(db.String(100))
     budget = db.Column(db.Float, nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     visibility = db.Column(db.String(10))  # 'public' or 'private'
