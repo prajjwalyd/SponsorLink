@@ -25,8 +25,13 @@
                         <span class="badge {% if ad_request.status == 'Accepted' %}bg-success{% elif ad_request.status == 'Rejected' %}bg-danger{% elif ad_request.status == 'Requested' %}bg-light{% elif ad_request.status == 'Negotiated' %}bg-warning text-dark{% endif %}">
                             {{ ad_request.status }}
                         </span>
+                        {% if ad_request.status == 'Negotiated' %}
+                        <p class="mt-2"><strong>Negotiation Comment:</strong> {{ ad_request.negotiation_comment }}</p>
+                        {% endif %}
                         <div class="mt-2">
+                            {% if ad_request.status != 'Accepted' %}
                             <a href="{{ url_for('update_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-secondary btn-sm">Edit</a>
+                            {% endif %}
                             <form method="POST" action="{{ url_for('delete_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                             </form>

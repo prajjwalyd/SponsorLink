@@ -105,12 +105,12 @@ class AdRequestForm(FlaskForm):
     influencer_id = SelectField('Influencer', coerce=int, validators=[DataRequired()])
     requirements = TextAreaField('Requirements', validators=[DataRequired()])
     payment_amount = FloatField('Payment Amount', validators=[DataRequired()])
-    status = SelectField('Status', choices=[
-        ('Requested', 'Requested'),
-        ('Accepted', 'Accepted'),
-        ('Rejected', 'Rejected'),
-        ('Negotiated', 'Negotiated')
-    ], validators=[DataRequired()])
+    # status = SelectField('Status', choices=[
+    #     ('Requested', 'Requested'),
+    #     ('Accepted', 'Accepted'),
+    #     ('Rejected', 'Rejected'),
+    #     ('Negotiated', 'Negotiated')
+    # ], validators=[DataRequired()])
     negotiation_comment = TextAreaField('Negotiation Comment', validators=[Optional()])
     submit = SubmitField('Save Ad Request')
 
@@ -337,7 +337,7 @@ def create_ad_request():
             influencer_id=form.influencer_id.data,
             requirements=form.requirements.data,
             payment_amount=form.payment_amount.data,
-            status=form.status.data
+            # status=form.status.data
         )
         db.session.add(ad_request)
         db.session.commit()
@@ -360,16 +360,16 @@ def update_ad_request(ad_request_id):
         ad_request.influencer_id = form.influencer_id.data
         ad_request.requirements = form.requirements.data
         ad_request.payment_amount = form.payment_amount.data
-        ad_request.status = form.status.data
+        ad_request.status = 'Requested'  # Reset the status to 'Requested'
         db.session.commit()
-        flash('Ad request updated successfully!', 'success')
+        flash('Your ad request has been updated and marked as Requested.', 'success')
         return redirect(url_for('sponsor_dashboard'))
     elif request.method == 'GET':
         form.campaign_id.data = ad_request.campaign_id
         form.influencer_id.data = ad_request.influencer_id
         form.requirements.data = ad_request.requirements
         form.payment_amount.data = ad_request.payment_amount
-        form.status.data = ad_request.status
+        # form.status.data = ad_request.status
     return render_template('create_ad_request.html', form=form, legend='Update Ad Request')
 
 @app.route('/ad_request/<int:ad_request_id>/delete', methods=['POST'])
