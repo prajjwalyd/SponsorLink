@@ -96,6 +96,7 @@ class CampaignForm(FlaskForm):
     description = TextAreaField('Description', validators=[DataRequired()])
     start_date = DateField('Start Date', format='%Y-%m-%d', validators=[DataRequired()])
     end_date = DateField('End Date', format='%Y-%m-%d', validators=[DataRequired()])
+    niche = StringField('Niche', validators=[DataRequired()])
     budget = FloatField('Budget', validators=[DataRequired()])  # Change from DecimalField to FloatField
     visibility = SelectField('Visibility', choices=[('public', 'Public'), ('private', 'Private')], validators=[DataRequired()])
     submit = SubmitField('Save Campaign')
@@ -125,6 +126,9 @@ class InfluencerProfileForm(FlaskForm):
     category = StringField('Category', validators=[DataRequired()])
     niche = StringField('Niche', validators=[DataRequired()])
     reach = FloatField('Reach', validators=[DataRequired()])
+    followers = FloatField('Followers', validators=[DataRequired()])
+    platform = StringField('Platform', validators=[DataRequired()])
+
     submit = SubmitField('Update Profile')
 
 
@@ -272,6 +276,7 @@ def create_campaign():
             start_date=form.start_date.data,
             end_date=form.end_date.data,
             budget=form.budget.data,
+            niche = form.niche.data,
             visibility=form.visibility.data,
             owner_id=current_user.id  # Use owner_id instead of owner
         )
@@ -295,6 +300,7 @@ def update_campaign(campaign_id):
         campaign.start_date = form.start_date.data
         campaign.end_date = form.end_date.data
         campaign.budget = form.budget.data
+        campaign.niche = form.niche.data
         campaign.visibility = form.visibility.data
         db.session.commit()
         flash('Campaign updated successfully!', 'success')
@@ -305,6 +311,7 @@ def update_campaign(campaign_id):
         form.start_date.data = campaign.start_date
         form.end_date.data = campaign.end_date
         form.budget.data = campaign.budget
+        form.niche.data = campaign.niche
         form.visibility.data = campaign.visibility
     return render_template('create_campaign.html', form=form, legend='Update Campaign')
 
@@ -488,6 +495,9 @@ def profile():
             current_user.category = form.category.data
             current_user.niche = form.niche.data
             current_user.reach = form.reach.data
+            current_user.followers = form.followers.data
+            current_user.platform = form.platform.data
+            
             db.session.commit()
             flash('Profile updated successfully!', 'success')
             return redirect(url_for('influencer_dashboard'))
@@ -495,6 +505,8 @@ def profile():
             form.category.data = current_user.category
             form.niche.data = current_user.niche
             form.reach.data = current_user.reach
+            form.followers.data = current_user.followers
+            form.platform.data = current_user.platform
         return render_template('profile.html', form=form)
     
     else:
