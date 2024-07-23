@@ -8,6 +8,9 @@
         <div class="form-group">
             {{ form.niche.label }} {{ form.niche(class="form-control") }}
         </div>
+        <div class="form-group">
+            {{ form.min_budget.label }} {{ form.min_budget(class="form-control") }}
+        </div>
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
     <h3>Results</h3>
@@ -16,6 +19,7 @@
         <li class="list-group-item">
             <strong>{{ campaign.name }}</strong><br>
             <strong>Description:</strong> {{ campaign.description }}<br>
+            <strong>Niche:</strong> {{ campaign.niche }}<br>
             <strong>Start Date:</strong> {{ campaign.start_date }}<br>
             <strong>End Date:</strong> {{ campaign.end_date }}<br>
             <strong>Budget:</strong> {{ campaign.budget }}<br>

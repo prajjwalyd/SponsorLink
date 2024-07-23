@@ -134,13 +134,16 @@ class InfluencerProfileForm(FlaskForm):
 
 
 class InfluencerSearchForm(FlaskForm):
+    platform = StringField('Platform', validators=[Optional()])
     niche = StringField('Niche', validators=[Optional()])
     reach_min = FloatField('Min Reach', validators=[Optional()])
-    reach_max = FloatField('Max Reach', validators=[Optional()])
+    followers_min = FloatField('Min Followers', validators=[Optional()])
+    # reach_max = FloatField('Max Reach', validators=[Optional()])
     submit = SubmitField('Search')
 
 class CampaignSearchForm(FlaskForm):
     niche = StringField('Niche', validators=[Optional()])
+    min_budget = FloatField('Min Budget', validators=[Optional()])
     submit = SubmitField('Search')
 
 
@@ -528,10 +531,17 @@ def search_influencers():
         query = User.query.filter_by(role='influencer')
         if form.niche.data:
             query = query.filter(User.niche.ilike(f"%{form.niche.data}%"))
+        if form.platform.data:
+            query = query.filter(User.platform.ilike(f"%{form.platform.data}%"))
+        
         if form.reach_min.data:
             query = query.filter(User.reach >= form.reach_min.data)
-        if form.reach_max.data:
-            query = query.filter(User.reach <= form.reach_max.data)
+        if form.followers_min.data:
+            query = query.filter(User.followers >= form.followers_min.data)
+
+        # if form.reach_max.data:
+        #     query = query.filter(User.reach <= form.reach_max.data)
+        
         influencers = query.all()
     return render_template('search_influencers.html', form=form, influencers=influencers)
 
@@ -546,7 +556,9 @@ def search_campaigns():
     if form.validate_on_submit():
         query = Campaign.query.filter_by(visibility='public')
         if form.niche.data:
-            query = query.join(User).filter(User.niche.ilike(f"%{form.niche.data}%"))
+            query = query.filter(Campaign.niche.ilike(f"%{form.niche.data}%"))
+        if form.min_budget.data:
+            query = query.filter(Campaign.budget >= form.min_budget.data)
         campaigns = query.all()
     return render_template('search_campaigns.html', form=form, campaigns=campaigns)
 
