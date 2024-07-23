@@ -563,6 +563,27 @@ def search_campaigns():
     return render_template('search_campaigns.html', form=form, campaigns=campaigns)
 
 
+@app.route('/ad_request/new/<int:influencer_id>', methods=['GET', 'POST'])
+@login_required
+def create_ad_request_for_influencer(influencer_id):
+    if current_user.role != 'sponsor':
+        flash('Access unauthorized!', 'danger')
+        return redirect(url_for('index'))
+    form = AdRequestForm()
+    form.campaign_id.choices = [(campaign.id, campaign.name) for campaign in current_user.campaigns]
+    form.influencer_id.choices = [(influencer_id, User.query.get(influencer_id).username)]
+    if form.validate_on_submit():
+        ad_request = AdRequest(
+            campaign_id=form.campaign_id.data,
+            influencer_id=form.influencer_id.data,
+            requirements=form.requirements.data,
+            payment_amount=form.payment_amount.data,
+        )
+        db.session.add(ad_request)
+        db.session.commit()
+        flash('Ad request created successfully!', 'success')
+        return redirect(url_for('sponsor_dashboard'))
+    return render_template('create_ad_request.html', form=form)
 
 
 

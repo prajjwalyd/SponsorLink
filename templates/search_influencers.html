@@ -25,9 +25,12 @@
         <li class="list-group-item">
             <strong>{{ influencer.username }}</strong><br>
             <strong>Platform:</strong> {{ influencer.platform }}<br>
-            <strong>Followers:</strong> {{ influencer.followers }}<br>
             <strong>Niche:</strong> {{ influencer.niche }}<br>
+            <strong>Followers:</strong> {{ influencer.followers }}<br>
             <strong>Reach:</strong> {{ influencer.reach }}<br>
+            <form method="GET" action="{{ url_for('create_ad_request_for_influencer', influencer_id=influencer.id) }}">
+                <button type="submit" class="btn btn-success mt-2">Send Ad Request</button>
+            </form>
         </li>
         {% endfor %}
     </ul>
