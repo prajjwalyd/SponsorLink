@@ -129,6 +129,18 @@ class InfluencerProfileForm(FlaskForm):
 
 
 
+class InfluencerSearchForm(FlaskForm):
+    niche = StringField('Niche', validators=[Optional()])
+    reach_min = FloatField('Min Reach', validators=[Optional()])
+    reach_max = FloatField('Max Reach', validators=[Optional()])
+    submit = SubmitField('Search')
+
+class CampaignSearchForm(FlaskForm):
+    niche = StringField('Niche', validators=[Optional()])
+    submit = SubmitField('Search')
+
+
+
 
 
 
@@ -488,6 +500,44 @@ def profile():
     else:
         flash('Admins cannot update profiles', 'danger')
         return redirect(url_for('index'))
+
+
+
+
+@app.route('/search_influencers', methods=['GET', 'POST'])
+@login_required
+def search_influencers():
+    if current_user.role != 'sponsor':
+        flash('Access unauthorized!', 'danger')
+        return redirect(url_for('index'))
+    form = InfluencerSearchForm()
+    influencers = []
+    if form.validate_on_submit():
+        query = User.query.filter_by(role='influencer')
+        if form.niche.data:
+            query = query.filter(User.niche.ilike(f"%{form.niche.data}%"))
+        if form.reach_min.data:
+            query = query.filter(User.reach >= form.reach_min.data)
+        if form.reach_max.data:
+            query = query.filter(User.reach <= form.reach_max.data)
+        influencers = query.all()
+    return render_template('search_influencers.html', form=form, influencers=influencers)
+
+@app.route('/search_campaigns', methods=['GET', 'POST'])
+@login_required
+def search_campaigns():
+    if current_user.role != 'influencer':
+        flash('Access unauthorized!', 'danger')
+        return redirect(url_for('index'))
+    form = CampaignSearchForm()
+    campaigns = []
+    if form.validate_on_submit():
+        query = Campaign.query.filter_by(visibility='public')
+        if form.niche.data:
+            query = query.join(User).filter(User.niche.ilike(f"%{form.niche.data}%"))
+        campaigns = query.all()
+    return render_template('search_campaigns.html', form=form, campaigns=campaigns)
+
 
 
 

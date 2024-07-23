@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}Search Campaigns{% endblock %}
+{% block content %}
+<div class="container">
+    <h1 class="text-center">Search Campaigns</h1>
+    <form method="POST" action="{{ url_for('search_campaigns') }}">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.niche.label }} {{ form.niche(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <h3>Results</h3>
+    <ul class="list-group">
+        {% for campaign in campaigns %}
+        <li class="list-group-item">
+            <strong>{{ campaign.name }}</strong><br>
+            <strong>Description:</strong> {{ campaign.description }}<br>
+            <strong>Start Date:</strong> {{ campaign.start_date }}<br>
+            <strong>End Date:</strong> {{ campaign.end_date }}<br>
+            <strong>Budget:</strong> {{ campaign.budget }}<br>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
