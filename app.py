@@ -115,6 +115,18 @@ class AdRequestForm(FlaskForm):
     submit = SubmitField('Save Ad Request')
 
 
+class SponsorProfileForm(FlaskForm):
+    company_name = StringField('Company Name', validators=[DataRequired()])
+    industry = StringField('Industry', validators=[DataRequired()])
+    budget = FloatField('Budget', validators=[DataRequired()])
+    submit = SubmitField('Update Profile')
+
+class InfluencerProfileForm(FlaskForm):
+    category = StringField('Category', validators=[DataRequired()])
+    niche = StringField('Niche', validators=[DataRequired()])
+    reach = FloatField('Reach', validators=[DataRequired()])
+    submit = SubmitField('Update Profile')
+
 
 
 
@@ -440,6 +452,42 @@ def remove_flag_campaign(campaign_id):
 
 
 
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if current_user.role == 'sponsor':
+        form = SponsorProfileForm()
+        if form.validate_on_submit():
+            current_user.company_name = form.company_name.data
+            current_user.industry = form.industry.data
+            current_user.budget = form.budget.data
+            db.session.commit()
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('sponsor_dashboard'))
+        elif request.method == 'GET':
+            form.company_name.data = current_user.company_name
+            form.industry.data = current_user.industry
+            form.budget.data = current_user.budget
+        return render_template('profile.html', form=form)
+    
+    elif current_user.role == 'influencer':
+        form = InfluencerProfileForm()
+        if form.validate_on_submit():
+            current_user.category = form.category.data
+            current_user.niche = form.niche.data
+            current_user.reach = form.reach.data
+            db.session.commit()
+            flash('Profile updated successfully!', 'success')
+            return redirect(url_for('influencer_dashboard'))
+        elif request.method == 'GET':
+            form.category.data = current_user.category
+            form.niche.data = current_user.niche
+            form.reach.data = current_user.reach
+        return render_template('profile.html', form=form)
+    
+    else:
+        flash('Admins cannot update profiles', 'danger')
+        return redirect(url_for('index'))
 
 
 
