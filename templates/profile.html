@@ -10,6 +10,10 @@
         
         {% if current_user.role == 'sponsor' %}
         <div class="form-group">
+            {{ form.email.label }}<br>
+            {{ form.email(class="form-control") }}<br>
+        </div>
+        <div class="form-group">
             {{ form.company_name.label }}<br>
             {{ form.company_name(class="form-control") }}<br>
         </div>
@@ -22,6 +26,10 @@
             {{ form.budget(class="form-control") }}<br>
         </div>
         {% elif current_user.role == 'influencer' %}
+        <div class="form-group">
+            {{ form.email.label }}<br>
+            {{ form.email(class="form-control") }}<br>
+        </div>
         <div class="form-group">
             {{ form.category.label }}<br>
             {{ form.category(class="form-control") }}<br>
@@ -37,10 +45,6 @@
         <div class="form-group">
             {{ form.followers.label }}<br>
             {{ form.followers(class="form-control") }}<br>
-        </div>
-        <div class="form-group">
-            {{ form.reach.label }}<br>
-            {{ form.reach(class="form-control") }}<br>
         </div>
         {% endif %}
         

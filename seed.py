@@ -3,13 +3,13 @@ from werkzeug.security import generate_password_hash
 
 def seed_data():
     users = [
-        User(username='sponsor1', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='TechCorp', industry='Technology', budget=10000),
-        User(username='sponsor2', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='HealthPlus', industry='Healthcare', budget=15000),
-        User(username='sponsor3', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='EcoHome', industry='Home Goods', budget=12000),
-        User(username='influencer1', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Fitness', niche='Yoga', reach=5000, followers=2000, platform='YouTube'),
-        User(username='influencer2', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Food', niche='Vegan', reach=3000, followers=1000, platform='Instagram'),
-        User(username='influencer3', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Travel', niche='Adventure', reach=7000, followers=4000, platform='YouTube'),
-        User(username='influencer4', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Fashion', niche='Streetwear', reach=6000, followers=1000, platform='Instagram')
+        User(username='sponsor1', email='sponsor1@gmail.com', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='TechCorp', industry='Technology', budget=10000),
+        User(username='sponsor2', email='sponsor2@gmail.com', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='HealthPlus', industry='Healthcare', budget=15000),
+        User(username='sponsor3', email='sponsor3@gmail.com', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='EcoHome', industry='Home Goods', budget=12000),
+        User(username='influencer1', email='influencer1@gmail.com', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Fitness', niche='Yoga', followers=2000, platform='YouTube'),
+        User(username='influencer2', email='influencer2@gmail.com', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Food', niche='Vegan', followers=1000, platform='Instagram'),
+        User(username='influencer3', email='influencer3@gmail.com', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Travel', niche='Adventure', followers=4000, platform='YouTube'),
+        User(username='influencer4', email='influencer4@gmail.com', password=generate_password_hash('password', method='scrypt'), role='influencer', category='Fashion', niche='Streetwear', followers=1000, platform='Instagram')
     ]
 
     campaigns = [

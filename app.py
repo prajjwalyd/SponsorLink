@@ -4,7 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, DateField, FloatField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, DateField, FloatField, EmailField
 from wtforms.validators import DataRequired, Length, EqualTo, Optional
 
 # Initialize the app and configurations
@@ -19,6 +19,7 @@ login_manager.login_view = 'login'
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), nullable=False)  # 'admin', 'sponsor', 'influencer'
     flagged = db.Column(db.Boolean, default=False)  # Flag for inappropriate users
@@ -33,7 +34,7 @@ class User(UserMixin, db.Model):
     # Influencer fields
     category = db.Column(db.String(100)) # Health, Gaming, etc.
     niche = db.Column(db.String(100))
-    reach = db.Column(db.Integer)
+    # reach = db.Column(db.Integer)
     followers = db.Column(db.Integer)
     platform = db.Column(db.String(10))
     def __repr__(self):
@@ -86,6 +87,7 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
+    email = EmailField('Email', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=200)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     role = SelectField('Role', choices=[('sponsor', 'Sponsor'), ('influencer', 'Influencer')], validators=[DataRequired()])
@@ -117,15 +119,17 @@ class AdRequestForm(FlaskForm):
 
 
 class SponsorProfileForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Length(min=6, max=120)])
     company_name = StringField('Company Name', validators=[DataRequired()])
     industry = StringField('Industry', validators=[DataRequired()])
     budget = FloatField('Budget', validators=[DataRequired()])
     submit = SubmitField('Update Profile')
 
 class InfluencerProfileForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Length(min=6, max=120)])
     category = StringField('Category', validators=[DataRequired()])
     niche = StringField('Niche', validators=[DataRequired()])
-    reach = FloatField('Reach', validators=[DataRequired()])
+    # reach = FloatField('Reach', validators=[DataRequired()])
     followers = FloatField('Followers', validators=[DataRequired()])
     platform = StringField('Platform', validators=[DataRequired()])
 
@@ -194,12 +198,13 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='scrypt')
-        new_user = User(username=form.username.data, password=hashed_password, role=form.role.data)
+        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password, role=form.role.data)
         db.session.add(new_user)
         db.session.commit()
         flash('Account created successfully! Please log in.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
 
 
 @app.route('/logout')
@@ -483,6 +488,7 @@ def profile():
             current_user.company_name = form.company_name.data
             current_user.industry = form.industry.data
             current_user.budget = form.budget.data
+            current_user.email = form.email.data
             db.session.commit()
             flash('Profile updated successfully!', 'success')
             return redirect(url_for('sponsor_dashboard'))
@@ -490,6 +496,7 @@ def profile():
             form.company_name.data = current_user.company_name
             form.industry.data = current_user.industry
             form.budget.data = current_user.budget
+            form.email.data = current_user.email
         return render_template('profile.html', form=form)
     
     elif current_user.role == 'influencer':
@@ -497,19 +504,20 @@ def profile():
         if form.validate_on_submit():
             current_user.category = form.category.data
             current_user.niche = form.niche.data
-            current_user.reach = form.reach.data
+            # current_user.reach = form.reach.data
             current_user.followers = form.followers.data
             current_user.platform = form.platform.data
-            
+            current_user.email = form.email.data
             db.session.commit()
             flash('Profile updated successfully!', 'success')
             return redirect(url_for('influencer_dashboard'))
         elif request.method == 'GET':
             form.category.data = current_user.category
             form.niche.data = current_user.niche
-            form.reach.data = current_user.reach
+            # form.reach.data = current_user.reach
             form.followers.data = current_user.followers
             form.platform.data = current_user.platform
+            form.email.data = current_user.email
         return render_template('profile.html', form=form)
     
     else:
@@ -594,12 +602,13 @@ def create_ad_request_for_influencer(influencer_id):
 
 def create_admin_user():
     admin_username = 'admin'
+    admin_email = 'admin@admin.com'
     admin_password = 'admin123'
     admin_role = 'admin'
     admin = User.query.filter_by(username=admin_username).first()
     if not admin:
         hashed_password = generate_password_hash(admin_password, method='scrypt')
-        admin = User(username=admin_username, password=hashed_password, role=admin_role)
+        admin = User(username=admin_username, email=admin_email, password=hashed_password, role=admin_role)
         db.session.add(admin)
         db.session.commit()
         print('Admin user created with username: admin and password: adminpass')
