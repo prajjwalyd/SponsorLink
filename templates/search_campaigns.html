@@ -23,6 +23,11 @@
             <strong>Start Date:</strong> {{ campaign.start_date }}<br>
             <strong>End Date:</strong> {{ campaign.end_date }}<br>
             <strong>Budget:</strong> {{ campaign.budget }}<br>
+            {% if campaign.owner %}
+            <a href="mailto:{{ campaign.owner.email }}" class="btn btn-success mt-2">Email Sponsor</a>
+            {% else %}
+            <span>No sponsor email available</span>
+            {% endif %}
         </li>
         {% endfor %}
     </ul>

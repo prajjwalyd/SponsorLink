@@ -559,16 +559,22 @@ def search_campaigns():
     if current_user.role != 'influencer':
         flash('Access unauthorized!', 'danger')
         return redirect(url_for('index'))
+    
     form = CampaignSearchForm()
     campaigns = []
+    
     if form.validate_on_submit():
-        query = Campaign.query.filter_by(visibility='public')
+        query = Campaign.query.filter_by(visibility='public').join(User, User.id == Campaign.owner_id)
+        
         if form.niche.data:
             query = query.filter(Campaign.niche.ilike(f"%{form.niche.data}%"))
         if form.min_budget.data:
             query = query.filter(Campaign.budget >= form.min_budget.data)
+        
         campaigns = query.all()
+    
     return render_template('search_campaigns.html', form=form, campaigns=campaigns)
+
 
 
 @app.route('/ad_request/new/<int:influencer_id>', methods=['GET', 'POST'])
