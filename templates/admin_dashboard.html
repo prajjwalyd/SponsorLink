@@ -22,12 +22,15 @@
         <h3>All Users</h3>
         <ul class="list-group mb-4">
             {% for user in users %}
+            {% if user.role!='admin' %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ user.username }} ({{ user.email if user.email else '' }})
+                {{ user.username }} ({{ user.role}})
                 <div>
+                    {% if user.flagged!=1 %}
                     <form method="POST" action="{{ url_for('flag_user', user_id=user.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">Flag</button>
                     </form>
+                    {% endif %}
                     {% if user.flagged %}
                     <form method="POST" action="{{ url_for('remove_flag_user', user_id=user.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Unflag</button>
@@ -35,6 +38,7 @@
                     {% endif %}
                 </div>
             </li>
+            {% endif %}
             {% else %}
             <li class="list-group-item">No users found.</li>
             {% endfor %}
@@ -43,12 +47,15 @@
         <h3>All Campaigns</h3>
         <ul class="list-group mb-4">
             {% for campaign in campaigns %}
+
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 {{ campaign.name }} by {{ campaign.owner.username }}
                 <div>
+                    {% if campaign.flagged!=1 %}
                     <form method="POST" action="{{ url_for('flag_campaign', campaign_id=campaign.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">Flag</button>
                     </form>
+                    {% endif %}
                     {% if campaign.flagged %}
                     <form method="POST" action="{{ url_for('remove_flag_campaign', campaign_id=campaign.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Unflag</button>
@@ -65,10 +72,15 @@
         <ul class="list-group mb-4">
             {% for flagged_user in flagged_users %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ flagged_user.username }} ({{ flagged_user.email if flagged_user.email else '' }})
-                <form method="POST" action="{{ url_for('remove_flag_user', user_id=flagged_user.id) }}" class="d-inline">
-                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                </form>
+                {{ flagged_user.username }} ({{ flagged_user.role }})
+                <div>
+                    <form method="POST" action="{{ url_for('remove_flag_user', user_id=flagged_user.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-warning btn-sm">UnFlag</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('delete_flagged_user', user_id=flagged_user.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
             </li>
             {% else %}
             <li class="list-group-item">No flagged users.</li>
@@ -80,9 +92,14 @@
             {% for flagged_campaign in flagged_campaigns %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 {{ flagged_campaign.name }} by {{ flagged_campaign.owner.username }}
-                <form method="POST" action="{{ url_for('remove_flag_campaign', campaign_id=flagged_campaign.id) }}" class="d-inline">
-                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                </form>
+                <div>
+                    <form method="POST" action="{{ url_for('remove_flag_campaign', campaign_id=flagged_campaign.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-warning btn-sm">UnFlag</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('delete_flagged_campaign', campaign_id=flagged_campaign.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
             </li>
             {% else %}
             <li class="list-group-item">No flagged campaigns.</li>

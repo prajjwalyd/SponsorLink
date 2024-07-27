@@ -15,7 +15,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-# Define User model
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
@@ -24,8 +24,8 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(20), nullable=False)  # 'admin', 'sponsor', 'influencer'
     flagged = db.Column(db.Boolean, default=False)  # Flag for inappropriate users
 
-    campaigns = db.relationship('Campaign', backref='owner', lazy=True)
-    ad_requests = db.relationship('AdRequest', backref='influencer', lazy=True)
+    campaigns = db.relationship('Campaign', backref='owner', lazy=True, cascade='all, delete-orphan')
+    ad_requests = db.relationship('AdRequest', backref='influencer', lazy=True, cascade='all, delete-orphan')
 
     # Sponsor fields
     company_name = db.Column(db.String(100))
@@ -34,13 +34,13 @@ class User(UserMixin, db.Model):
     # Influencer fields
     category = db.Column(db.String(100)) # Health, Gaming, etc.
     niche = db.Column(db.String(100))
-    # reach = db.Column(db.Integer)
     followers = db.Column(db.Integer)
     platform = db.Column(db.String(10))
+
     def __repr__(self):
         return f'<User {self.username}>'
 
-# Define Campaign model
+# Campaign model
 class Campaign(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -49,24 +49,25 @@ class Campaign(db.Model):
     end_date = db.Column(db.DateTime)
     niche = db.Column(db.String(100))
     budget = db.Column(db.Float, nullable=False)
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     visibility = db.Column(db.String(10))  # 'public' or 'private'
     flagged = db.Column(db.Boolean, default=False)
-    ad_requests = db.relationship('AdRequest', backref='campaign', lazy=True)
+    ad_requests = db.relationship('AdRequest', backref='campaign', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
         return f'<Campaign {self.name}>'
 
-# Define AdRequest model
+# AdRequest model
 class AdRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
-    influencer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id', ondelete='CASCADE'), nullable=False)
+    influencer_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     messages = db.Column(db.Text)
     requirements = db.Column(db.Text)
     payment_amount = db.Column(db.Integer)
     negotiation_comment = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), nullable=False, default='Requested')
+    flagged = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f'<AdRequest {self.id}>'
@@ -223,8 +224,10 @@ def logout():
 def admin_dashboard():
     users = User.query.all()
     campaigns = Campaign.query.all()
+    ad_requests = AdRequest.query.all()
     flagged_users = User.query.filter_by(flagged=True).all()
     flagged_campaigns = Campaign.query.filter_by(flagged=True).all()
+    flagged_ad_requests = AdRequest.query.filter_by(flagged=True).all()
 
     statistics = {
         'active_users': User.query.count(),  # Fixed to show total users
@@ -241,8 +244,10 @@ def admin_dashboard():
         'admin_dashboard.html',
         users=users,
         campaigns=campaigns,
+        ad_requests=ad_requests,
         flagged_users=flagged_users,
         flagged_campaigns=flagged_campaigns,
+        flagged_ad_requests=flagged_ad_requests,
         **statistics
     )
 
@@ -475,6 +480,51 @@ def remove_flag_campaign(campaign_id):
     db.session.commit()
     return redirect(url_for('admin_dashboard'))
 
+@app.route('/delete_flagged_campaign/<int:campaign_id>', methods=['POST'])
+@login_required
+def delete_flagged_campaign(campaign_id):
+    campaign = Campaign.query.get(campaign_id)
+    if campaign:
+        db.session.delete(campaign)
+        db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/delete_flagged_user/<int:user_id>', methods=['POST'])
+@login_required
+def delete_flagged_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/flag_ad_request/<int:ad_request_id>', methods=['POST'])
+@login_required
+def flag_ad_request(ad_request_id):
+    ad_request = AdRequest.query.get(ad_request_id)
+    if ad_request:
+        ad_request.flagged = True
+        db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/remove_flag_ad_request/<int:ad_request_id>', methods=['POST'])
+@login_required
+def remove_flag_ad_request(ad_request_id):
+    ad_request = AdRequest.query.get(ad_request_id)
+    if ad_request:
+        ad_request.flagged = False
+        db.session.commit()
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/delete_flagged_ad_request/<int:ad_request_id>', methods=['POST'])
+@login_required
+def delete_flagged_ad_request(ad_request_id):
+    ad_request = AdRequest.query.get(ad_request_id)
+    if ad_request:
+        db.session.delete(ad_request)
+        db.session.commit()
+    return redirect(url_for('admin_dashboard'))
 
 
 
