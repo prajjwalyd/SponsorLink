@@ -25,9 +25,15 @@
             <strong>Platform:</strong> {{ influencer.platform }}<br>
             <strong>Niche:</strong> {{ influencer.niche }}<br>
             <strong>Followers:</strong> {{ influencer.followers }}<br>
-            <form method="GET" action="{{ url_for('create_ad_request_for_influencer', influencer_id=influencer.id) }}">
-                <button type="submit" class="btn btn-success mt-2">Send Ad Request</button>
-            </form>
+            <div class="d-flex justify-content-start mt-2">
+                <form method="GET" action="{{ url_for('create_ad_request_for_influencer', influencer_id=influencer.id) }}">
+                    <button type="submit" class="btn btn-success mr-2">Send Ad Request</button>
+                </form>
+                <form method="GET" action="{{ url_for('user_profile', username=influencer.username) }}">
+                    <button type="submit" class="btn btn-success">View Profile</button>
+                </form>
+            </div>
+            
         </li>
         {% endfor %}
     </ul>
