@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}Profile Page{% endblock %}
+{% block content %}
+<div class="profile-info">
+    <h1>{{ user.username }}</h1>
+    {% if user.role == 'sponsor' %}
+        <!-- <h3>Sponsor Details</h3> -->
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Company Name:</strong> {{ user.company_name }}</p>
+        <p><strong>Industry:</strong> {{ user.industry }}</p>
+        <p><strong>Budget:</strong> {{ user.budget }}</p>
+    {% elif user.role == 'influencer' %}
+        <!-- <h3>Influencer Details</h3> -->
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Followers:</strong> {{ user.followers }}</p>
+        <p><strong>Platform:</strong> {{ user.platform }}</p>
+        <p><strong>Category:</strong> {{ user.category }}</p>
+        <p><strong>Niche:</strong> {{ user.niche }}</p>
+    {% endif %}
+</div>
+{% endblock %}

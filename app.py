@@ -525,6 +525,11 @@ def profile():
         return redirect(url_for('index'))
 
 
+@app.route('/<username>')
+def user_profile(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    return render_template('profile_page.html', user=user)
+
 
 
 @app.route('/search_influencers', methods=['GET', 'POST'])
