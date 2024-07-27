@@ -68,6 +68,30 @@
             {% endfor %}
         </ul>
 
+        <h3>Ad Requests</h3>
+        <ul class="list-group mb-4">
+            {% for ad_request in ad_requests %}
+
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ ad_request.id }} of {{ ad_request.campaign_id }}
+                <div>
+                    {% if ad_request.flagged!=1 %}
+                    <form method="POST" action="{{ url_for('flag_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-warning btn-sm">Flag</button>
+                    </form>
+                    {% endif %}
+                    {% if ad_request.flagged %}
+                    <form method="POST" action="{{ url_for('remove_flag_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Unflag</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </li>
+            {% else %}
+            <li class="list-group-item">No campaigns found.</li>
+            {% endfor %}
+        </ul>
+
         <h3>Flagged Users</h3>
         <ul class="list-group mb-4">
             {% for flagged_user in flagged_users %}
@@ -103,6 +127,25 @@
             </li>
             {% else %}
             <li class="list-group-item">No flagged campaigns.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Flagged Ad Requests</h3>
+        <ul class="list-group mb-4">
+            {% for flagged_ad_request in flagged_ad_requests %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ flagged_ad_request.id }} of {{ flagged_ad_request.campaign_id }}
+                <div>
+                    <form method="POST" action="{{ url_for('remove_flag_ad_request', ad_request_id=flagged_ad_request.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-warning btn-sm">UnFlag</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('delete_flagged_ad_request', ad_request_id=flagged_ad_request.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+            </li>
+            {% else %}
+            <li class="list-group-item">No flagged ad requests.</li>
             {% endfor %}
         </ul>
     </div>
