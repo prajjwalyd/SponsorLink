@@ -62,7 +62,7 @@ class AdRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id', ondelete='CASCADE'), nullable=False)
     influencer_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    messages = db.Column(db.Text)
+    name = db.Column(db.String(100), nullable=False)
     requirements = db.Column(db.Text)
     payment_amount = db.Column(db.Integer)
     negotiation_comment = db.Column(db.Text, nullable=True)
@@ -107,6 +107,7 @@ class CampaignForm(FlaskForm):
 class AdRequestForm(FlaskForm):
     campaign_id = SelectField('Campaign', coerce=int, validators=[DataRequired()])
     influencer_id = SelectField('Influencer', coerce=int, validators=[DataRequired()])
+    name = StringField('Ad Request Name', validators=[DataRequired()])
     requirements = TextAreaField('Requirements', validators=[DataRequired()])
     payment_amount = FloatField('Payment Amount', validators=[DataRequired()])
     # status = SelectField('Status', choices=[
@@ -355,6 +356,7 @@ def create_ad_request():
         ad_request = AdRequest(
             campaign_id=form.campaign_id.data,
             influencer_id=form.influencer_id.data,
+            name = form.name.data,
             requirements=form.requirements.data,
             payment_amount=form.payment_amount.data,
             # status=form.status.data
@@ -378,6 +380,7 @@ def update_ad_request(ad_request_id):
     if form.validate_on_submit():
         ad_request.campaign_id = form.campaign_id.data
         ad_request.influencer_id = form.influencer_id.data
+        ad_request.name = form.name.data
         ad_request.requirements = form.requirements.data
         ad_request.payment_amount = form.payment_amount.data
         ad_request.status = 'Requested'  # Reset the status to 'Requested'
@@ -387,6 +390,7 @@ def update_ad_request(ad_request_id):
     elif request.method == 'GET':
         form.campaign_id.data = ad_request.campaign_id
         form.influencer_id.data = ad_request.influencer_id
+        form.name.data = ad_request.name
         form.requirements.data = ad_request.requirements
         form.payment_amount.data = ad_request.payment_amount
         # form.status.data = ad_request.status

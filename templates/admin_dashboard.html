@@ -18,6 +18,8 @@
         </ul>
         <h3>Charts</h3>
         <canvas id="campaignsChart" width="200" height="200"></canvas>
+        <br>
+        <br>
         <canvas id="adRequestsChart" width="200" height="200"></canvas>
     </div>
 
@@ -29,6 +31,9 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 {{ user.username }} ({{ user.role}})
                 <div>
+                    <form method="GET" action="{{ url_for('user_profile', username=user.username) }}" class="d-inline">
+                        <button type="submit" class="btn btn-primary btn-sm">View Profile</button>
+                    </form>
                     {% if user.flagged!=1 %}
                     <form method="POST" action="{{ url_for('flag_user', user_id=user.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">Flag</button>

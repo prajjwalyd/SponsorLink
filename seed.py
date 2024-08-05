@@ -20,14 +20,14 @@ def seed_data():
     ]
 
     ad_requests = [
-        AdRequest(campaign_id=1, influencer_id=5, requirements='Promote on Instagram', payment_amount=300, status='Requested'),
-        AdRequest(campaign_id=1, influencer_id=6, requirements='Write a blog post', payment_amount=200, status='Accepted'),
-        AdRequest(campaign_id=2, influencer_id=6, requirements='Create a YouTube video', payment_amount=500, status='Negotiated', negotiation_comment='Need higher payment'),
-        AdRequest(campaign_id=3, influencer_id=7, requirements='Instagram stories and post', payment_amount=350, status='Requested'),
-        AdRequest(campaign_id=3, influencer_id=7, requirements='Create a travel vlog', payment_amount=400, status='Accepted'),
-        AdRequest(campaign_id=4, influencer_id=8, requirements='Fashion haul video', payment_amount=250, status='Requested'),
-        AdRequest(campaign_id=4, influencer_id=8, requirements='Streetwear blog post', payment_amount=150, status='Requested'),
-        AdRequest(campaign_id=2, influencer_id=8, requirements='Fashion advice video', payment_amount=300, status='Requested')
+        AdRequest(campaign_id=1, influencer_id=5, name='Promote on Instagram', requirements='do a short promotion on instagram reels telling more about our product', payment_amount=300, status='Requested'),
+        AdRequest(campaign_id=1, influencer_id=6, name='Write a blog post', requirements='write a short blogpost on our product', payment_amount=200, status='Accepted'),
+        AdRequest(campaign_id=2, influencer_id=6, name='Create a YouTube video', requirements='create a high quality youtube video for our product', payment_amount=500, status='Negotiated', negotiation_comment='Need higher payment'),
+        AdRequest(campaign_id=3, influencer_id=7, name='Instagram stories and post', requirements='do a short promotion on instagram stories and reels telling more about our product', payment_amount=350, status='Requested'),
+        AdRequest(campaign_id=3, influencer_id=7, name='Create a travel vlog', requirements='create a travel blog series', payment_amount=400, status='Accepted'),
+        AdRequest(campaign_id=4, influencer_id=8, name='Fashion haul video', requirements='do a short fashion hall show', payment_amount=250, status='Requested'),
+        AdRequest(campaign_id=4, influencer_id=8, name='Streetwear blog post', requirements='write a short blogpost on streetwear', payment_amount=150, status='Requested'),
+        AdRequest(campaign_id=2, influencer_id=8, name='Fashion advice video', requirements='create a fashion advice video', payment_amount=300, status='Requested')
     ]
 
     db.session.add_all(users)

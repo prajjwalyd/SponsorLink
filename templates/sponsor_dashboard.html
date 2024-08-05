@@ -21,7 +21,7 @@
                 <ul class="list-group">
                     {% for ad_request in campaign.ad_requests %}
                     <li class="list-group-item">
-                        {{ ad_request.influencer.username }} - {{ ad_request.requirements }} - {{ ad_request.payment_amount }} 
+                        {{ ad_request.influencer.username }} - {{ ad_request.name }} - {{ ad_request.payment_amount }} 
                         <span class="badge {% if ad_request.status == 'Accepted' %}bg-success{% elif ad_request.status == 'Rejected' %}bg-danger{% elif ad_request.status == 'Requested' %}bg-light{% elif ad_request.status == 'Negotiated' %}bg-warning text-dark{% endif %}">
                             {{ ad_request.status }}
                         </span>
