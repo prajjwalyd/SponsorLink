@@ -12,6 +12,7 @@
                 {% for ad in requested_ads %}
                 <li class="list-group-item">
                     <strong>Campaign:</strong> {{ ad.campaign.name }}<br>
+                    <strong>Ad Name:</strong> {{ ad.name }}<br>
                     <strong>Requirements:</strong> {{ ad.requirements }}<br>
                     <strong>Payment Amount:</strong> {{ ad.payment_amount }}<br>
                     <form method="POST" action="{{ url_for('accept_ad_request', ad_request_id=ad.id) }}" style="display:inline;">
@@ -31,9 +32,10 @@
                 {% for ad in current_ads %}
                 <li class="list-group-item">
                     <strong>Campaign:</strong> {{ ad.campaign.name }}<br>
+                    <strong>Ad Name:</strong> {{ ad.name }}<br>
                     <strong>Requirements:</strong> {{ ad.requirements }}<br>
                     <strong>Payment Amount:</strong> {{ ad.payment_amount }}<br>
-                    <strong>Status:</strong> {{ ad.status }}
+                    <strong>Status:</strong> <span class="badge bg-success">{{ ad.status }}</span>
                 </li>
                 {% endfor %}
             </ul>
@@ -44,10 +46,11 @@
                 {% for ad in negotiated_ads %}
                 <li class="list-group-item">
                     <strong>Campaign:</strong> {{ ad.campaign.name }}<br>
+                    <strong>Ad Name:</strong> {{ ad.name }}<br>
                     <strong>Requirements:</strong> {{ ad.requirements }}<br>
                     <strong>Payment Amount:</strong> {{ ad.payment_amount }}<br>
                     <strong>Negotiation Comment:</strong> {{ ad.negotiation_comment }}<br>
-                    <strong>Status:</strong> {{ ad.status }}
+                    <strong>Status:</strong> <span class="badge bg-warning">{{ ad.status }}</span>
                 </li>
                 {% endfor %}
             </ul>

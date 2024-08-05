@@ -82,7 +82,7 @@
 
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="d-flex flex-grow-1 align-items-center">
-                    <span class="me-auto">{{ ad_request.id }} of {{ ad_request.campaign.name }} ({{ ad_request.influencer.username }})</span>
+                    <span class="me-auto">{{ ad_request.name }} of {{ ad_request.campaign.name }} ({{ ad_request.influencer.username }})</span>
                     <span class="badge {% if ad_request.status == 'Accepted' %}bg-success{% elif ad_request.status == 'Rejected' %}bg-danger{% elif ad_request.status == 'Requested' %}bg-light{% elif ad_request.status == 'Negotiated' %}bg-warning text-dark{% endif %}">
                         {{ ad_request.status }}
                     </span>
