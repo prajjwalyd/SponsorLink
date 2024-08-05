@@ -9,13 +9,16 @@
         <ul class="list-group mb-4">
             <li class="list-group-item">Active Users: {{ active_users }}</li>
             <li class="list-group-item">Total Campaigns: {{ total_campaigns }}</li>
-            <li class="list-group-item">Public Campaigns: {{ public_campaigns }}</li>
-            <li class="list-group-item">Private Campaigns: {{ private_campaigns }}</li>
+            <!-- <li class="list-group-item">Public Campaigns: {{ public_campaigns }}</li>
+            <li class="list-group-item">Private Campaigns: {{ private_campaigns }}</li> -->
             <li class="list-group-item">Total Ad Requests: {{ total_ad_requests }}</li>
-            <li class="list-group-item">Accepted: {{ accepted_requests }}</li>
+            <!-- <li class="list-group-item">Accepted: {{ accepted_requests }}</li>
             <li class="list-group-item">Rejected: {{ rejected_requests }}</li>
-            <li class="list-group-item">Negotiated: {{ negotiated_requests }}</li>
+            <li class="list-group-item">Negotiated: {{ negotiated_requests }}</li> -->
         </ul>
+        <h3>Charts</h3>
+        <canvas id="campaignsChart" width="200" height="200"></canvas>
+        <canvas id="adRequestsChart" width="200" height="200"></canvas>
     </div>
 
     <div class="col-md-8">
@@ -156,4 +159,65 @@
         </ul>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Campaigns Chart
+        var ctx = document.getElementById('campaignsChart').getContext('2d');
+        var campaignsChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Public Campaigns', 'Private Campaigns'],
+                datasets: [{
+                    data: [{{ public_campaigns }}, {{ private_campaigns }}],
+                    backgroundColor: ['blue', 'purple']
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Campaigns Visibility'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+
+        // Ad Requests Chart
+        var ctx = document.getElementById('adRequestsChart').getContext('2d');
+        var adRequestsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Accepted', 'Rejected', 'Negotiated'],
+                datasets: [{
+                    label: 'Ad Requests',
+                    data: [{{ accepted_requests }}, {{ rejected_requests }}, {{ negotiated_requests }}],
+                    backgroundColor: ['green', 'red', 'yellow']
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Ad Requests Status'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
