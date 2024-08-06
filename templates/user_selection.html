@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %}Select User Type{% endblock %}
+{% block content %}
+<h1 class="text-center">Select User Type</h1>
+<form action="{{ url_for('register') }}" method="post" class="mt-4">
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="user_type" id="sponsor" value="sponsor" required>
+        <label class="form-check-label" for="sponsor">
+            Sponsor
+        </label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="user_type" id="influencer" value="influencer" required>
+        <label class="form-check-label" for="influencer">
+            Influencer
+        </label>
+    </div>
+    <div class="text-center mt-3">
+        <button type="submit" class="btn btn-primary">Next</button>
+    </div>
+</form>
+{% endblock %}

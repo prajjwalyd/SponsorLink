@@ -94,6 +94,27 @@ class RegistrationForm(FlaskForm):
     role = SelectField('Role', choices=[('sponsor', 'Sponsor'), ('influencer', 'Influencer')], validators=[DataRequired()])
     submit = SubmitField('Register')
 
+class SponsorRegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
+    email = EmailField('Email', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=200)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    company_name = StringField('Company Name', validators=[DataRequired()])
+    industry = StringField('Industry', validators=[DataRequired()])
+    budget = FloatField('Budget', validators=[DataRequired()])
+    submit = SubmitField('Register')
+
+class InfluencerRegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
+    email = EmailField('Email', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=200)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    category = StringField('Category', validators=[DataRequired()])
+    niche = StringField('Niche', validators=[DataRequired()])
+    followers = FloatField('Followers', validators=[DataRequired()])
+    platform = StringField('Platform', validators=[DataRequired()])
+    submit = SubmitField('Register')
+
 class CampaignForm(FlaskForm):
     name = StringField('Campaign Name', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
@@ -164,9 +185,7 @@ class CampaignSearchForm(FlaskForm):
 @app.route('/')
 def home():
     if current_user.is_authenticated:
-        if current_user.role == 'admin':
-            return redirect(url_for('admin_dashboard'))
-        elif current_user.role == 'sponsor':
+        if current_user.role == 'sponsor':
             return redirect(url_for('sponsor_dashboard'))
         elif current_user.role == 'influencer':
             return redirect(url_for('influencer_dashboard'))
@@ -178,33 +197,98 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user and check_password_hash(user.password, form.password.data):
+        if user.username == 'admin':
+            flash('Unauthorized!', 'danger')
+        elif user and check_password_hash(user.password, form.password.data):
             login_user(user)
             flash('Logged in successfully!', 'success')
-            if user.role == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            elif user.role == 'sponsor':
+            if user.role == 'sponsor':
                 return redirect(url_for('sponsor_dashboard'))
             elif user.role == 'influencer':
                 return redirect(url_for('influencer_dashboard'))
-            else:
-                return redirect(url_for('index'))
         else:
             flash('Invalid username or password', 'danger')
     return render_template('login.html', form=form)
 
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and user.role == 'admin' and check_password_hash(user.password, form.password.data):
+            login_user(user)
+            flash('Admin logged in successfully!', 'success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid admin username or password', 'danger')
+    return render_template('admin_login.html', form=form)
+
+
+# @app.route('/register', methods=['GET', 'POST'])
+# def register():
+#     form = RegistrationForm()
+#     if form.validate_on_submit():
+#         hashed_password = generate_password_hash(form.password.data, method='scrypt')
+#         new_user = User(username=form.username.data, email=form.email.data, password=hashed_password, role=form.role.data)
+#         db.session.add(new_user)
+#         db.session.commit()
+#         flash('Account created successfully! Please log in.', 'success')
+#         return redirect(url_for('login'))
+#     return render_template('register.html', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegistrationForm()
+    if request.method == 'POST':
+        user_type = request.form.get('user_type')
+        if user_type == 'sponsor':
+            return redirect(url_for('register_sponsor'))
+        elif user_type == 'influencer':
+            return redirect(url_for('register_influencer'))
+        else:
+            return "Error: Invalid user type selected", 400
+    return render_template('user_selection.html')
+
+
+@app.route('/register/sponsor', methods=['GET', 'POST'])
+def register_sponsor():
+    form = SponsorRegistrationForm()
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='scrypt')
-        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password, role=form.role.data)
+        new_user = User(
+            username=form.username.data,
+            email=form.email.data,
+            password=hashed_password,
+            role='sponsor',
+            company_name=form.company_name.data,
+            industry=form.industry.data,
+            budget=form.budget.data
+        )
         db.session.add(new_user)
         db.session.commit()
-        flash('Account created successfully! Please log in.', 'success')
+        flash('Sponsor account created successfully! Please log in.', 'success')
         return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+    return render_template('register_sponsor.html', form=form)
+
+@app.route('/register/influencer', methods=['GET', 'POST'])
+def register_influencer():
+    form = InfluencerRegistrationForm()
+    if form.validate_on_submit():
+        hashed_password = generate_password_hash(form.password.data, method='scrypt')
+        new_user = User(
+            username=form.username.data,
+            email=form.email.data,
+            password=hashed_password,
+            role='influencer',
+            category=form.category.data,
+            niche=form.niche.data,
+            followers=form.followers.data,
+            platform=form.platform.data
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Influencer account created successfully! Please log in.', 'success')
+        return redirect(url_for('login'))
+    return render_template('register_influencer.html', form=form)
 
 
 
