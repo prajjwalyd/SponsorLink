@@ -4,15 +4,17 @@
 <h1 class="text-center mb-4">Sponsor Dashboard</h1>
 <a href="{{ url_for('profile') }}" class="btn btn-secondary">Update Profile</a>
 <a href="{{ url_for('search_influencers') }}" class="btn btn-primary">Search Influencers</a>
+<br>
+<br>
 <div class="row">
     <div class="col-md-6">
         <h3>Your Campaigns</h3>
-        <a href="{{ url_for('create_campaign') }}" class="btn btn-primary mb-3">Create New Campaign</a>
+        <a href="{{ url_for('create_campaign') }}" class="btn btn-info mb-3">Create New Campaign</a>
         <ul class="list-group">
             {% for campaign in campaigns %}
             <li class="list-group-item">
                 <div class="d-flex justify-content-between align-items-center">
-                    <a href="{{ url_for('update_campaign', campaign_id=campaign.id) }}">{{ campaign.name }}</a>
+                    <a href="{{ url_for('update_campaign', campaign_id=campaign.id) }}"><h2>{{ campaign.name }}</h2></a>
                     <form method="POST" action="{{ url_for('delete_campaign', campaign_id=campaign.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                     </form>
@@ -21,7 +23,7 @@
                 <ul class="list-group">
                     {% for ad_request in campaign.ad_requests %}
                     <li class="list-group-item">
-                        {{ ad_request.influencer.username }} - {{ ad_request.name }} - {{ ad_request.payment_amount }} 
+                        <strong>{{ ad_request.influencer.username }}</strong> - {{ ad_request.name }} (&#x20b9;{{ ad_request.payment_amount }}) 
                         <span class="badge {% if ad_request.status == 'Accepted' %}bg-success{% elif ad_request.status == 'Rejected' %}bg-danger{% elif ad_request.status == 'Requested' %}bg-light{% elif ad_request.status == 'Negotiated' %}bg-warning text-dark{% endif %}">
                             {{ ad_request.status }}
                         </span>

@@ -14,7 +14,7 @@
                     <strong>Campaign:</strong> {{ ad.campaign.name }}<br>
                     <strong>Ad Name:</strong> {{ ad.name }}<br>
                     <strong>Requirements:</strong> {{ ad.requirements }}<br>
-                    <strong>Payment Amount:</strong> {{ ad.payment_amount }}<br>
+                    <strong>Payment Amount:</strong> &#x20b9;{{ ad.payment_amount }}<br>
                     <form method="POST" action="{{ url_for('accept_ad_request', ad_request_id=ad.id) }}" style="display:inline;">
                         <button type="submit" class="btn btn-success btn-sm">Accept</button>
                     </form>
@@ -34,7 +34,7 @@
                     <strong>Campaign:</strong> {{ ad.campaign.name }}<br>
                     <strong>Ad Name:</strong> {{ ad.name }}<br>
                     <strong>Requirements:</strong> {{ ad.requirements }}<br>
-                    <strong>Payment Amount:</strong> {{ ad.payment_amount }}<br>
+                    <strong>Payment Amount:</strong> &#x20b9;{{ ad.payment_amount }}<br>
                     <strong>Status:</strong> <span class="badge bg-success">{{ ad.status }}</span>
                 </li>
                 {% endfor %}
@@ -48,7 +48,7 @@
                     <strong>Campaign:</strong> {{ ad.campaign.name }}<br>
                     <strong>Ad Name:</strong> {{ ad.name }}<br>
                     <strong>Requirements:</strong> {{ ad.requirements }}<br>
-                    <strong>Payment Amount:</strong> {{ ad.payment_amount }}<br>
+                    <strong>Payment Amount:</strong> &#x20b9;{{ ad.payment_amount }}<br>
                     <strong>Negotiation Comment:</strong> {{ ad.negotiation_comment }}<br>
                     <strong>Status:</strong> <span class="badge bg-warning">{{ ad.status }}</span>
                 </li>

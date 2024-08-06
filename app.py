@@ -144,7 +144,6 @@ class InfluencerSearchForm(FlaskForm):
     niche = StringField('Niche', validators=[Optional()])
     reach_min = FloatField('Min Reach', validators=[Optional()])
     followers_min = FloatField('Min Followers', validators=[Optional()])
-    # reach_max = FloatField('Max Reach', validators=[Optional()])
     submit = SubmitField('Search')
 
 class CampaignSearchForm(FlaskForm):
@@ -292,7 +291,7 @@ def create_campaign():
             budget=form.budget.data,
             niche = form.niche.data,
             visibility=form.visibility.data,
-            owner_id=current_user.id  # Use owner_id instead of owner
+            owner_id=current_user.id 
         )
         db.session.add(campaign)
         db.session.commit()
@@ -558,7 +557,6 @@ def profile():
         if form.validate_on_submit():
             current_user.category = form.category.data
             current_user.niche = form.niche.data
-            # current_user.reach = form.reach.data
             current_user.followers = form.followers.data
             current_user.platform = form.platform.data
             current_user.email = form.email.data
@@ -568,7 +566,6 @@ def profile():
         elif request.method == 'GET':
             form.category.data = current_user.category
             form.niche.data = current_user.niche
-            # form.reach.data = current_user.reach
             form.followers.data = current_user.followers
             form.platform.data = current_user.platform
             form.email.data = current_user.email
@@ -605,9 +602,6 @@ def search_influencers():
             query = query.filter(User.reach >= form.reach_min.data)
         if form.followers_min.data:
             query = query.filter(User.followers >= form.followers_min.data)
-
-        # if form.reach_max.data:
-        #     query = query.filter(User.reach <= form.reach_max.data)
         
         influencers = query.all()
     return render_template('search_influencers.html', form=form, influencers=influencers)
@@ -649,6 +643,7 @@ def create_ad_request_for_influencer(influencer_id):
         ad_request = AdRequest(
             campaign_id=form.campaign_id.data,
             influencer_id=form.influencer_id.data,
+            name = form.name.data,
             requirements=form.requirements.data,
             payment_amount=form.payment_amount.data,
         )
