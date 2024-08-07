@@ -30,8 +30,6 @@ def login():
         if user.username == 'admin':
             flash('Unauthorized!', 'danger')
         elif user and check_password_hash(user.password, form.password.data):
-            # token = user.get_token()
-            # return jsonify({'token': token}), 200
             login_user(user)
             flash('Logged in successfully!', 'success')
             if user.role == 'sponsor':
@@ -56,18 +54,6 @@ def admin_login():
     return render_template('admin_login.html', form=form)
 
 
-# @app.route('/register', methods=['GET', 'POST'])
-# def register():
-#     form = RegistrationForm()
-#     if form.validate_on_submit():
-#         hashed_password = generate_password_hash(form.password.data, method='scrypt')
-#         new_user = User(username=form.username.data, email=form.email.data, password=hashed_password, role=form.role.data)
-#         db.session.add(new_user)
-#         db.session.commit()
-#         flash('Account created successfully! Please log in.', 'success')
-#         return redirect(url_for('login'))
-#     return render_template('register.html', form=form)
-
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -85,44 +71,50 @@ def register():
 def register_sponsor():
     form = SponsorRegistrationForm()
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data, method='scrypt')
-        new_user = User(
-            username=form.username.data,
-            email=form.email.data,
-            password=hashed_password,
-            role='sponsor',
-            company_name=form.company_name.data,
-            industry=form.industry.data,
-            budget=form.budget.data
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Sponsor account created successfully! Please log in.', 'success')
-        return redirect(url_for('auth.login'))
+        existing_user = User.query.filter((User.username == form.username.data) | (User.email == form.email.data)).first()
+        if existing_user:
+            flash('Username or email already taken', 'danger')
+        else:
+            hashed_password = generate_password_hash(form.password.data, method='scrypt')
+            new_user = User(
+                username=form.username.data,
+                email=form.email.data,
+                password=hashed_password,
+                role='sponsor',
+                company_name=form.company_name.data,
+                industry=form.industry.data,
+                budget=form.budget.data
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Sponsor account created successfully! Please log in.', 'success')
+            return redirect(url_for('auth.login'))
     return render_template('register_sponsor.html', form=form)
 
 @bp.route('/register/influencer', methods=['GET', 'POST'])
 def register_influencer():
     form = InfluencerRegistrationForm()
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data, method='scrypt')
-        new_user = User(
-            username=form.username.data,
-            email=form.email.data,
-            password=hashed_password,
-            role='influencer',
-            category=form.category.data,
-            niche=form.niche.data,
-            followers=form.followers.data,
-            platform=form.platform.data
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Influencer account created successfully! Please log in.', 'success')
-        return redirect(url_for('auth.login'))
+        existing_user = User.query.filter((User.username == form.username.data) | (User.email == form.email.data)).first()
+        if existing_user:
+            flash('Username or email already taken', 'danger')
+        else:
+            hashed_password = generate_password_hash(form.password.data, method='scrypt')
+            new_user = User(
+                username=form.username.data,
+                email=form.email.data,
+                password=hashed_password,
+                role='influencer',
+                category=form.category.data,
+                niche=form.niche.data,
+                followers=form.followers.data,
+                platform=form.platform.data
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Influencer account created successfully! Please log in.', 'success')
+            return redirect(url_for('auth.login'))
     return render_template('register_influencer.html', form=form)
-
-
 
 @bp.route('/logout')
 @login_required
