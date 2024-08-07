@@ -6,15 +6,22 @@ from flask_migrate import Migrate
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, DateField, FloatField, EmailField
 from wtforms.validators import DataRequired, Length, EqualTo, Optional
+from flask_restful import Api, Resource, reqparse
+from flask import jsonify
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+
 
 # Initialize the app and configurations
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+jwt = JWTManager(app)
+api = Api(app)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,6 +43,10 @@ class User(UserMixin, db.Model):
     niche = db.Column(db.String(100))
     followers = db.Column(db.Integer)
     platform = db.Column(db.String(10))
+
+    def get_token(self):
+        token = create_access_token(identity=self.id)
+        return token
 
     def __repr__(self):
         return f'<User {self.username}>'
@@ -77,6 +88,91 @@ class AdRequest(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+@app.route('/api/get_token', methods=['POST'])
+def api_login():
+    data = request.get_json()
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({'error': 'Invalid input'}), 400
+
+    user = User.query.filter_by(username=data['username']).first()
+    if user and check_password_hash(user.password, data['password']):
+        if user.username == 'admin':
+            return jsonify({'error': 'Unauthorized!'}), 403
+        token = user.get_token()
+        return jsonify({'token': token}), 200
+    return jsonify({'error': 'Invalid username or password'}), 401
+
+
+class PublicCampaignsAPI(Resource):
+    def get(self):
+        campaigns = Campaign.query.filter_by(visibility='public').all()
+        return jsonify([{
+            'id': campaign.id,
+            'name': campaign.name,
+            'description': campaign.description,
+            'niche': campaign.niche,
+            'budget': campaign.budget
+        } for campaign in campaigns])
+
+class PublicInfluencersAPI(Resource):
+    def get(self):
+        influencers = User.query.filter_by(role='influencer').all()
+        return jsonify([{
+            'id': influencer.id,
+            'username': influencer.username,
+            'category': influencer.category,
+            'niche': influencer.niche,
+            'followers': influencer.followers,
+            'platform': influencer.platform
+        } for influencer in influencers])
+
+class CampaignsAPI(Resource):
+    @jwt_required()
+    def get(self):
+        current_user_id = get_jwt_identity()
+        campaigns = Campaign.query.filter_by(owner_id=current_user_id).all()
+        return jsonify([{
+            'id': campaign.id,
+            'name': campaign.name,
+            'description': campaign.description,
+            'niche': campaign.niche,
+            'budget': campaign.budget,
+            'visibility': campaign.visibility
+        } for campaign in campaigns])
+    
+    @jwt_required()
+    def post(self):
+        data = request.get_json()
+        current_user_id = get_jwt_identity()
+        new_campaign = Campaign(
+            name=data['name'],
+            description=data['description'],
+            niche=data['niche'],
+            budget=data['budget'],
+            visibility=data['visibility'],
+            owner_id=current_user_id
+        )
+        db.session.add(new_campaign)
+        db.session.commit()
+        return jsonify({'message': 'Campaign created successfully'})
+
+
+    @jwt_required()
+    def delete(self):
+        data = request.get_json()
+        current_user_id = get_jwt_identity()
+        campaign = Campaign.query.filter_by(name=data['name'], owner_id=current_user_id).first()
+        if campaign:
+            db.session.delete(campaign)
+            db.session.commit()
+            return jsonify({'message': 'Campaign deleted successfully'})
+        return jsonify({'message': 'Campaign not found'}), 404
+
+# Add resources to API
+api.add_resource(PublicCampaignsAPI, '/api/public/campaigns')
+api.add_resource(PublicInfluencersAPI, '/api/public/influencers')
+api.add_resource(CampaignsAPI, '/api/campaigns')
 
 
 
@@ -200,6 +296,8 @@ def login():
         if user.username == 'admin':
             flash('Unauthorized!', 'danger')
         elif user and check_password_hash(user.password, form.password.data):
+            # token = user.get_token()
+            # return jsonify({'token': token}), 200
             login_user(user)
             flash('Logged in successfully!', 'success')
             if user.role == 'sponsor':
