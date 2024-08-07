@@ -24,6 +24,7 @@ def admin_dashboard():
         'accepted_requests': AdRequest.query.filter_by(status='Accepted').count(),
         'rejected_requests': AdRequest.query.filter_by(status='Rejected').count(),
         'negotiated_requests': AdRequest.query.filter_by(status='Negotiated').count(),
+        'requested_requests': AdRequest.query.filter_by(status='Requested').count()
     }
 
     return render_template(

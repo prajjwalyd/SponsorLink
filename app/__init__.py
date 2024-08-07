@@ -8,7 +8,7 @@ from flask_restful import Api
 db = SQLAlchemy()
 login_manager = LoginManager()
 
-def create_app():
+def SponsorLink():
     app = Flask(__name__)
     app.config.from_object(Config)
 

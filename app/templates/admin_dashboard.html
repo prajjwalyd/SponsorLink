@@ -9,12 +9,10 @@
         <ul class="list-group mb-4">
             <li class="list-group-item">Active Users: {{ active_users }}</li>
             <li class="list-group-item">Total Campaigns: {{ total_campaigns }}</li>
-            <!-- <li class="list-group-item">Public Campaigns: {{ public_campaigns }}</li>
-            <li class="list-group-item">Private Campaigns: {{ private_campaigns }}</li> -->
             <li class="list-group-item">Total Ad Requests: {{ total_ad_requests }}</li>
             <!-- <li class="list-group-item">Accepted: {{ accepted_requests }}</li>
             <li class="list-group-item">Rejected: {{ rejected_requests }}</li>
-            <li class="list-group-item">Negotiated: {{ negotiated_requests }}</li> -->
+            <li class="list-group-item">Requested: {{ requested_requests }}</li>-->
         </ul>
         <h3>Charts</h3>
         <canvas id="campaignsChart" width="200" height="200"></canvas>
@@ -55,10 +53,12 @@
         <h3>All Campaigns</h3>
         <ul class="list-group mb-4">
             {% for campaign in campaigns %}
-
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 {{ campaign.name }} by {{ campaign.owner.username }} ({{ campaign.visibility }})
                 <div>
+                    <form method="GET" action="{{ url_for('campaign.update_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-primary btn-sm">View Details</button>
+                    </form>
                     {% if campaign.flagged!=1 %}
                     <form method="POST" action="{{ url_for('admin.flag_campaign', campaign_id=campaign.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">Flag</button>
@@ -79,7 +79,6 @@
         <h3>All Ad Requests</h3>
         <ul class="list-group mb-4">
             {% for ad_request in ad_requests %}
-
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div class="d-flex flex-grow-1 align-items-center">
                     <span class="me-auto">{{ ad_request.name }} of {{ ad_request.campaign.name }} ({{ ad_request.influencer.username }})</span>
@@ -88,6 +87,9 @@
                     </span>
                 </div>
                 <div>
+                    <form method="GET" action="{{ url_for('ad_request.update_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-primary btn-sm">View Details</button>
+                    </form>
                     {% if ad_request.flagged != 1 %}
                     <form method="POST" action="{{ url_for('admin.flag_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">Flag</button>
@@ -100,12 +102,10 @@
                     {% endif %}
                 </div>
             </li>
-            
             {% else %}
             <li class="list-group-item">No campaigns found.</li>
             {% endfor %}
         </ul>
-
         <h3>Flagged Users</h3>
         <ul class="list-group mb-4">
             {% for flagged_user in flagged_users %}
@@ -198,11 +198,11 @@
         var adRequestsChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Accepted', 'Rejected', 'Negotiated'],
+                labels: ['Accepted', 'Rejected', 'Requested', 'Negotiated'],
                 datasets: [{
                     label: 'Ad Requests',
-                    data: [{{ accepted_requests }}, {{ rejected_requests }}, {{ negotiated_requests }}],
-                    backgroundColor: ['green', 'red', 'yellow']
+                    data: [{{ accepted_requests }}, {{ rejected_requests }}, {{requested_requests}}, {{ negotiated_requests }}],
+                    backgroundColor: ['green', 'red', 'gray', 'yellow']
                 }]
             },
             options: {

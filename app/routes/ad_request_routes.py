@@ -35,7 +35,8 @@ def create_ad_request():
 @login_required
 def update_ad_request(ad_request_id):
     ad_request = AdRequest.query.get_or_404(ad_request_id)
-    if ad_request.campaign.owner != current_user:
+    # Check if the user is the owner or an admin
+    if ad_request.campaign.owner != current_user and not current_user.role == 'admin':
         flash('Access unauthorized!', 'danger')
         return redirect(url_for('auth.home'))
     form = AdRequestForm()

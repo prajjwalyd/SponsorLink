@@ -35,7 +35,8 @@ def create_campaign():
 @login_required
 def update_campaign(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
-    if campaign.owner != current_user:
+    # Check if the user is the owner or an admin
+    if campaign.owner != current_user and not current_user.role == 'admin':
         flash('Access unauthorized!', 'danger')
         return redirect(url_for('auth.home'))
     form = CampaignForm()
