@@ -1,5 +1,6 @@
 from . import db
 from flask_login import UserMixin
+from flask_jwt_extended import create_access_token
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
