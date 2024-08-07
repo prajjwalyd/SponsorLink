@@ -27,18 +27,21 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user.username == 'admin':
+
+        if user is None or not check_password_hash(user.password, form.password.data):
+            flash('Invalid username or password', 'danger')
+        elif user.username == 'admin':
             flash('Unauthorized!', 'danger')
-        elif user and check_password_hash(user.password, form.password.data):
+        else:
             login_user(user)
             flash('Logged in successfully!', 'success')
             if user.role == 'sponsor':
                 return redirect(url_for('user.sponsor_dashboard'))
             elif user.role == 'influencer':
                 return redirect(url_for('user.influencer_dashboard'))
-        else:
-            flash('Invalid username or password', 'danger')
+
     return render_template('login.html', form=form)
+
 
 @bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():

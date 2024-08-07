@@ -17,7 +17,7 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Register')
 
 class SponsorRegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
+    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=50)])
     email = EmailField('Email', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=200)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
@@ -27,9 +27,9 @@ class SponsorRegistrationForm(FlaskForm):
     submit = SubmitField('Register')
 
 class InfluencerRegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=50)])
+    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=50)])
     email = EmailField('Email', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=200)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=100)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     category = StringField('Category', validators=[DataRequired()])
     niche = StringField('Niche', validators=[DataRequired()])
@@ -64,14 +64,14 @@ class AdRequestForm(FlaskForm):
 
 
 class SponsorProfileForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(min=6, max=120)])
+    email = EmailField('Email', validators=[DataRequired()])
     company_name = StringField('Company Name', validators=[DataRequired()])
     industry = StringField('Industry', validators=[DataRequired()])
     budget = FloatField('Budget', validators=[DataRequired()])
     submit = SubmitField('Update Profile')
 
 class InfluencerProfileForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(min=6, max=120)])
+    email = EmailField('Email', validators=[DataRequired()])
     category = StringField('Category', validators=[DataRequired()])
     niche = StringField('Niche', validators=[DataRequired()])
     # reach = FloatField('Reach', validators=[DataRequired()])
