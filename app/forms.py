@@ -80,8 +80,6 @@ class InfluencerProfileForm(FlaskForm):
 
     submit = SubmitField('Update Profile')
 
-
-
 class InfluencerSearchForm(FlaskForm):
     platform = StringField('Platform', validators=[Optional()])
     niche = StringField('Niche', validators=[Optional()])
@@ -93,4 +91,11 @@ class CampaignSearchForm(FlaskForm):
     niche = StringField('Niche', validators=[Optional()])
     min_budget = FloatField('Min Budget', validators=[Optional()])
     submit = SubmitField('Search')
+
+class PaymentForm(FlaskForm):
+    payment_amt = FloatField('Payment Amount', validators=[DataRequired()])
+    card_number = StringField('Card Number', validators=[DataRequired(), Length(min=16, max=16)])
+    expiry_date = StringField('Expiry Date (MM/YY)', validators=[DataRequired()])
+    cvv = StringField('CVV', validators=[DataRequired(), Length(min=3, max=3)])
+    submit = SubmitField('Initiate Payment')
 

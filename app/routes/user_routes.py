@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
-from app.forms import SponsorProfileForm, InfluencerProfileForm, CampaignSearchForm, InfluencerSearchForm
+from app.forms import PaymentForm, SponsorProfileForm, InfluencerProfileForm, CampaignSearchForm, InfluencerSearchForm
 from app.models import User, AdRequest, Campaign
 from app import db
 
@@ -110,6 +110,19 @@ def profile():
 def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     return render_template('profile_page.html', user=user)
+
+@bp.route('/payment', methods=['GET', 'POST'])
+@login_required
+def payment():
+    form = PaymentForm()
+    if form.validate_on_submit():
+        # Process payment here
+        # dummy
+        flash('Payment processed successfully!', 'success')
+        return redirect(url_for('user.sponsor_dashboard'))
+    
+    return render_template('payment.html', form=form)
+
 
 
 

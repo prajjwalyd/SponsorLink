@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block title %}Payment{% endblock %}
+{% block content %}
+<h1 class="text-center">Payment Details</h1>
+<form method="POST" class="mt-4" id="paymentForm" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.payment_amt.label(class="form-label") }}
+        {{ form.payment_amt(class="form-control", required=True) }}
+        {% if form.payment_amt.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.payment_amt.errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="invalid-feedback">Enter a valid amount greater than 0.</div>
+    </div>
+    <div class="form-group">
+        {{ form.card_number.label(class="form-label") }}
+        {{ form.card_number(class="form-control", required=True) }}
+        {% if form.card_number.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.card_number.errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="invalid-feedback">Enter a valid 16 digit card number.</div>
+    </div>
+    <div class="form-group">
+        {{ form.expiry_date.label(class="form-label") }}
+        {{ form.expiry_date(class="form-control", required=True) }}
+        {% if form.expiry_date.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.expiry_date.errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="invalid-feedback">Enter a valid expiry date in MM/YY format.</div>
+    </div>
+    <div class="form-group">
+        {{ form.cvv.label(class="form-label") }}
+        {{ form.cvv(class="form-control", required=True) }}
+        {% if form.cvv.errors %}
+            <div class="invalid-feedback d-block">
+                {% for error in form.cvv.errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="invalid-feedback">Enter a valid 3 digit CVV.</div>
+    </div>
+    <div class="form-group text-center mt-3">
+        {{ form.submit(class="btn btn-success") }}
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('paymentForm');
+    
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        form.classList.add('was-validated');
+    }, false);
+});
+</script>
+{% endblock %}
