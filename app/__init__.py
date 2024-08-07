@@ -31,9 +31,9 @@ def create_app():
 
         # Seed the database
         from .seed import seed_admin, seed_data
+        db.create_all()
         seed_admin()
         seed_data()
         register_resources(api) # Register API resources
-        db.create_all()
 
     return app

@@ -1,9 +1,12 @@
-project/
+```
+SponsorLink/
 │
 ├── app/
 │   ├── __init__.py
+|   ├── api.py
 │   ├── models.py
 │   ├── forms.py
+|   ├── seed.py
 │   ├── routes/
 │   │   ├── __init__.py
 │   │   ├── auth_routes.py
@@ -12,22 +15,12 @@ project/
 │   │   ├── campaign_routes.py
 │   │   ├── ad_request_routes.py
 │   └── templates/
-│       ├── base.html
 │       ├── index.html
-│       ├── login.html
-│       ├── register.html
-│       ├── admin_dashboard.html
-│       ├── sponsor_dashboard.html
-│       ├── influencer_dashboard.html
-│       ├── create_campaign.html
-│       ├── create_ad_request.html
-│       ├── negotiate_ad_request.html
-│       ├── profile.html
-│       ├── search_influencers.html
-│       ├── search_campaigns.html
-├── migrations/
-│
+│       ├── layout.html
+│       ├── ... more
+├── app.db
 ├── app.py
 ├── config.py
 ├── requirements.txt
-└── .env
+└── README.md
+```
