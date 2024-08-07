@@ -1,3 +1,4 @@
+# app/seed.py
 from werkzeug.security import generate_password_hash
 from app import db
 from app.models import User, Campaign, AdRequest
@@ -18,7 +19,8 @@ def seed_admin():
         print("Admin user already exists.")
 
 def seed_data():
-    if not User.query.first():
+    # Check if there are any users other than the admin
+    if User.query.filter(User.username != 'admin').count() == 0:
         users = [
             User(username='sponsor1', email='sponsor1@gmail.com', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='TechCorp', industry='Technology', budget=10000),
             User(username='sponsor2', email='sponsor2@gmail.com', password=generate_password_hash('password', method='scrypt'), role='sponsor', company_name='HealthPlus', industry='Healthcare', budget=15000),
