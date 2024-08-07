@@ -3,8 +3,8 @@
 {% block content %}
 <div class="container">
     <h1 class="text-center">Influencer Dashboard</h1>
-    <a href="{{ url_for('profile') }}" class="btn btn-secondary">Update Profile</a>
-    <a href="{{ url_for('search_campaigns') }}" class="btn btn-primary">Search Campaigns</a>
+    <a href="{{ url_for('user.profile') }}" class="btn btn-secondary">Update Profile</a>
+    <a href="{{ url_for('user.search_campaigns') }}" class="btn btn-primary">Search Campaigns</a>
     <div class="row">
         <div class="col-md-4">
             <h3>Requested Ads</h3>
@@ -15,13 +15,13 @@
                     <strong>Ad Name:</strong> {{ ad.name }}<br>
                     <strong>Requirements:</strong> {{ ad.requirements }}<br>
                     <strong>Payment Amount:</strong> &#x20b9;{{ ad.payment_amount }}<br>
-                    <form method="POST" action="{{ url_for('accept_ad_request', ad_request_id=ad.id) }}" style="display:inline;">
+                    <form method="POST" action="{{ url_for('ad_request.accept_ad_request', ad_request_id=ad.id) }}" style="display:inline;">
                         <button type="submit" class="btn btn-success btn-sm">Accept</button>
                     </form>
-                    <form method="POST" action="{{ url_for('reject_ad_request', ad_request_id=ad.id) }}" style="display:inline;">
+                    <form method="POST" action="{{ url_for('ad_request.reject_ad_request', ad_request_id=ad.id) }}" style="display:inline;">
                         <button type="submit" class="btn btn-danger btn-sm">Reject</button>
                     </form>
-                    <a href="{{ url_for('negotiate_ad_request', ad_request_id=ad.id) }}" class="btn btn-warning btn-sm">Negotiate</a>
+                    <a href="{{ url_for('ad_request.negotiate_ad_request', ad_request_id=ad.id) }}" class="btn btn-warning btn-sm">Negotiate</a>
                 </li>
                 {% endfor %}
             </ul>

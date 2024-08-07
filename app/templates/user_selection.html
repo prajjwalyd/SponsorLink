@@ -2,7 +2,7 @@
 {% block title %}Select User Type{% endblock %}
 {% block content %}
 <h1 class="text-center">Select User Type</h1>
-<form action="{{ url_for('register') }}" method="post" class="mt-4">
+<form action="{{ url_for('auth.register') }}" method="post" class="mt-4">
     <div class="form-check">
         <input class="form-check-input" type="radio" name="user_type" id="sponsor" value="sponsor" required>
         <label class="form-check-label" for="sponsor">

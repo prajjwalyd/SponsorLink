@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <h1 class="text-center">Search Influencers</h1>
-    <form method="POST" action="{{ url_for('search_influencers') }}">
+    <form method="POST" action="{{ url_for('user.search_influencers') }}">
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.platform.label }} {{ form.platform(class="form-control") }}
@@ -26,10 +26,10 @@
             <strong>Niche:</strong> {{ influencer.niche }}<br>
             <strong>Followers:</strong> {{ influencer.followers }}<br>
             <div class="d-flex justify-content-start mt-2">
-                <form method="GET" action="{{ url_for('create_ad_request_for_influencer', influencer_id=influencer.id) }}">
+                <form method="GET" action="{{ url_for('ad_request.create_ad_request_for_influencer', influencer_id=influencer.id) }}">
                     <button type="submit" class="btn btn-success mr-2">Send Ad Request</button>
                 </form>
-                <form method="GET" action="{{ url_for('user_profile', username=influencer.username) }}">
+                <form method="GET" action="{{ url_for('user.user_profile', username=influencer.username) }}">
                     <button type="submit" class="btn btn-primary">View Profile</button>
                 </form>
             </div>

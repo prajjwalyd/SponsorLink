@@ -2,24 +2,24 @@
 {% block title %}Sponsor Dashboard{% endblock %}
 {% block content %}
 <h1 class="text-center mb-4">Sponsor Dashboard</h1>
-<a href="{{ url_for('profile') }}" class="btn btn-secondary">Update Profile</a>
-<a href="{{ url_for('search_influencers') }}" class="btn btn-primary">Search Influencers</a>
+<a href="{{ url_for('user.profile') }}" class="btn btn-secondary">Update Profile</a>
+<a href="{{ url_for('user.search_influencers') }}" class="btn btn-primary">Search Influencers</a>
 <br>
 <br>
 <div class="row">
     <div class="col-md-6">
         <h3>Your Campaigns</h3>
-        <a href="{{ url_for('create_campaign') }}" class="btn btn-info mb-3">Create New Campaign</a>
+        <a href="{{ url_for('campaign.create_campaign') }}" class="btn btn-info mb-3">Create New Campaign</a>
         <ul class="list-group">
             {% for campaign in campaigns %}
             <li class="list-group-item">
                 <div class="d-flex justify-content-between align-items-center">
-                    <a href="{{ url_for('update_campaign', campaign_id=campaign.id) }}"><h2>{{ campaign.name }}</h2></a>
-                    <form method="POST" action="{{ url_for('delete_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                    <a href="{{ url_for('campaign.update_campaign', campaign_id=campaign.id) }}"><h2>{{ campaign.name }}</h2></a>
+                    <form method="POST" action="{{ url_for('campaign.delete_campaign', campaign_id=campaign.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                     </form>
                 </div>
-                <a href="{{ url_for('create_ad_request') }}" class="btn btn-primary btn-sm mt-2 mb-2">Create New Ad Request</a>
+                <a href="{{ url_for('ad_request.create_ad_request') }}" class="btn btn-primary btn-sm mt-2 mb-2">Create New Ad Request</a>
                 <ul class="list-group">
                     {% for ad_request in campaign.ad_requests %}
                     <li class="list-group-item">
@@ -32,9 +32,9 @@
                         {% endif %}
                         <div class="mt-2">
                             {% if ad_request.status != 'Accepted' %}
-                            <a href="{{ url_for('update_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-secondary btn-sm">Edit</a>
+                            <a href="{{ url_for('ad_request.update_ad_request', ad_request_id=ad_request.id) }}" class="btn btn-secondary btn-sm">Edit</a>
                             {% endif %}
-                            <form method="POST" action="{{ url_for('delete_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
+                            <form method="POST" action="{{ url_for('ad_request.delete_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                             </form>
                         </div>

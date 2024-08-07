@@ -3,7 +3,7 @@
 {% block content %}
 <h1 class="text-center">Welcome to the Influencer Engagement and Sponsorship Coordination Platform</h1>
 <div class="text-center">
-    <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
-    <a href="{{ url_for('register') }}" class="btn btn-secondary">Register</a>
+    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login</a>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-secondary">Register</a>
 </div>
 {% endblock %}
