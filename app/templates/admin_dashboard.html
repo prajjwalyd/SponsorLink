@@ -31,16 +31,16 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 {{ user.username }} ({{ user.role}})
                 <div>
-                    <form method="GET" action="{{ url_for('user_profile', username=user.username) }}" class="d-inline">
+                    <form method="GET" action="{{ url_for('user.user_profile', username=user.username) }}" class="d-inline">
                         <button type="submit" class="btn btn-primary btn-sm">View Profile</button>
                     </form>
                     {% if user.flagged!=1 %}
-                    <form method="POST" action="{{ url_for('flag_user', user_id=user.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.flag_user', user_id=user.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">Flag</button>
                     </form>
                     {% endif %}
                     {% if user.flagged %}
-                    <form method="POST" action="{{ url_for('remove_flag_user', user_id=user.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.remove_flag_user', user_id=user.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Unflag</button>
                     </form>
                     {% endif %}
@@ -60,12 +60,12 @@
                 {{ campaign.name }} by {{ campaign.owner.username }} ({{ campaign.visibility }})
                 <div>
                     {% if campaign.flagged!=1 %}
-                    <form method="POST" action="{{ url_for('flag_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.flag_campaign', campaign_id=campaign.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">Flag</button>
                     </form>
                     {% endif %}
                     {% if campaign.flagged %}
-                    <form method="POST" action="{{ url_for('remove_flag_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.remove_flag_campaign', campaign_id=campaign.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Unflag</button>
                     </form>
                     {% endif %}
@@ -89,12 +89,12 @@
                 </div>
                 <div>
                     {% if ad_request.flagged != 1 %}
-                    <form method="POST" action="{{ url_for('flag_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.flag_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">Flag</button>
                     </form>
                     {% endif %}
                     {% if ad_request.flagged %}
-                    <form method="POST" action="{{ url_for('remove_flag_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.remove_flag_ad_request', ad_request_id=ad_request.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Unflag</button>
                     </form>
                     {% endif %}
@@ -112,10 +112,10 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 {{ flagged_user.username }} ({{ flagged_user.role }})
                 <div>
-                    <form method="POST" action="{{ url_for('remove_flag_user', user_id=flagged_user.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.remove_flag_user', user_id=flagged_user.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">UnFlag</button>
                     </form>
-                    <form method="POST" action="{{ url_for('delete_flagged_user', user_id=flagged_user.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.delete_flagged_user', user_id=flagged_user.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                     </form>
                 </div>
@@ -131,10 +131,10 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 {{ flagged_campaign.name }} by {{ flagged_campaign.owner.username }}
                 <div>
-                    <form method="POST" action="{{ url_for('remove_flag_campaign', campaign_id=flagged_campaign.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.remove_flag_campaign', campaign_id=flagged_campaign.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">UnFlag</button>
                     </form>
-                    <form method="POST" action="{{ url_for('delete_flagged_campaign', campaign_id=flagged_campaign.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.delete_flagged_campaign', campaign_id=flagged_campaign.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                     </form>
                 </div>
@@ -148,12 +148,12 @@
         <ul class="list-group mb-4">
             {% for flagged_ad_request in flagged_ad_requests %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ flagged_ad_request.id }} of {{ flagged_ad_request.campaign_id }} ({{ flagged_ad_request.status }})
+                {{ flagged_ad_request.name }} of {{ flagged_ad_request.campaign.name }} ({{ flagged_ad_request.influencer.username }})
                 <div>
-                    <form method="POST" action="{{ url_for('remove_flag_ad_request', ad_request_id=flagged_ad_request.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.remove_flag_ad_request', ad_request_id=flagged_ad_request.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-warning btn-sm">UnFlag</button>
                     </form>
-                    <form method="POST" action="{{ url_for('delete_flagged_ad_request', ad_request_id=flagged_ad_request.id) }}" class="d-inline">
+                    <form method="POST" action="{{ url_for('admin.delete_flagged_ad_request', ad_request_id=flagged_ad_request.id) }}" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                     </form>
                 </div>
