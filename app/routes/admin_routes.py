@@ -72,6 +72,9 @@ def remove_flag_ad_request(ad_request_id):
         db.session.commit()
     return redirect(url_for('user.admin_dashboard'))
 
+
+
+
 @bp.route('/delete_flagged_ad_request/<int:ad_request_id>', methods=['POST'])
 @login_required
 def delete_flagged_ad_request(ad_request_id):

@@ -33,10 +33,7 @@ def create_app():
         from .seed import seed_admin, seed_data
         seed_admin()
         seed_data()
-
-        # Register API resources
-        register_resources(api)
-
+        register_resources(api) # Register API resources
         db.create_all()
 
     return app

@@ -18,7 +18,7 @@ class User(UserMixin, db.Model):
     industry = db.Column(db.String(100))
     budget = db.Column(db.Integer)
     # Influencer fields
-    category = db.Column(db.String(100)) # Health, Gaming, etc.
+    category = db.Column(db.String(100)) 
     niche = db.Column(db.String(100))
     followers = db.Column(db.Integer)
     platform = db.Column(db.String(10))

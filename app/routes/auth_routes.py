@@ -130,8 +130,3 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'success')
     return redirect(url_for('auth.home'))
-
-# @app.route('/dashboard')
-# @login_required
-# def dashboard():
-#     return render_template('dashboard.html', name=current_user.username)
