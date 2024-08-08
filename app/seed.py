@@ -4,6 +4,7 @@ from app import db
 from app.models import User, Campaign, AdRequest
 
 def seed_admin():
+    # check if an admin is already present or not
     admin = User.query.filter_by(username='admin').first()
     if not admin:
         admin = User(

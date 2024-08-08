@@ -13,11 +13,11 @@ class User(UserMixin, db.Model):
     campaigns = db.relationship('Campaign', backref='owner', lazy=True, cascade='all, delete-orphan')
     ad_requests = db.relationship('AdRequest', backref='influencer', lazy=True, cascade='all, delete-orphan')
 
-    # Sponsor fields
+    # for Sponsors
     company_name = db.Column(db.String(100))
     industry = db.Column(db.String(100))
     budget = db.Column(db.Integer)
-    # Influencer fields
+    # for Influencer
     category = db.Column(db.String(100)) 
     niche = db.Column(db.String(100))
     followers = db.Column(db.Integer)
@@ -39,7 +39,7 @@ class Campaign(db.Model):
     niche = db.Column(db.String(100))
     budget = db.Column(db.Float, nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    visibility = db.Column(db.String(10))  # 'public' or 'private'
+    visibility = db.Column(db.String(10))  # public or private
     flagged = db.Column(db.Boolean, default=False)
     ad_requests = db.relationship('AdRequest', backref='campaign', lazy=True, cascade='all, delete-orphan')
 

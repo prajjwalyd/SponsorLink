@@ -21,8 +21,8 @@ def create_ad_request(campaign_id):
         return redirect(url_for('auth.home'))
 
     form = AdRequestForm()
-    form.campaign_id.choices = [(campaign.id, campaign.name)]  # Pre-select the campaign
-    form.campaign_id.data = campaign.id  # Pre-set the campaign ID
+    form.campaign_id.choices = [(campaign.id, campaign.name)]  # Preselect the campaign
+    form.campaign_id.data = campaign.id  # Preset the campaign ID
     form.influencer_id.choices = [(influencer.id, influencer.username) for influencer in User.query.filter_by(role='influencer').all()]
 
     if form.validate_on_submit():
@@ -126,20 +126,30 @@ def negotiate_ad_request(ad_request_id):
         return redirect(url_for('user.influencer_dashboard'))
     return render_template('negotiate_ad_request.html', legend='Negotiate Ad Request', form=form)
 
-@bp.route('/ad_request/new/<int:influencer_id>', methods=['GET', 'POST'])
+@bp.route('/ad_request/new_for_influencer/<int:influencer_id>', methods=['GET', 'POST'])
 @login_required
 def create_ad_request_for_influencer(influencer_id):
     if current_user.role != 'sponsor':
         flash('Access unauthorized!', 'danger')
         return redirect(url_for('auth.home'))
+
+    influencer = User.query.filter_by(id=influencer_id, role='influencer').first_or_404()
+    campaigns = Campaign.query.filter_by(owner_id=current_user.id).all()
+
+    if not campaigns:
+        flash('You must have at least one active campaign to create an ad request.', 'danger')
+        return redirect(url_for('user.sponsor_dashboard'))
+
     form = AdRequestForm()
-    form.campaign_id.choices = [(campaign.id, campaign.name) for campaign in current_user.campaigns]
-    form.influencer_id.choices = [(influencer_id, User.query.get(influencer_id).username)]
+    form.influencer_id.choices = [(influencer.id, influencer.username)]
+    form.influencer_id.data = influencer.id
+    form.campaign_id.choices = [(campaign.id, campaign.name) for campaign in campaigns]
+
     if form.validate_on_submit():
         ad_request = AdRequest(
             campaign_id=form.campaign_id.data,
             influencer_id=form.influencer_id.data,
-            name = form.name.data,
+            name=form.name.data,
             requirements=form.requirements.data,
             payment_amount=form.payment_amount.data,
         )
@@ -147,5 +157,5 @@ def create_ad_request_for_influencer(influencer_id):
         db.session.commit()
         flash('Ad request created successfully!', 'success')
         return redirect(url_for('user.sponsor_dashboard'))
-    return render_template('create_ad_request.html', form=form)
 
+    return render_template('create_ad_request.html', form=form, legend=f'Create Ad Request for {influencer.username}')
