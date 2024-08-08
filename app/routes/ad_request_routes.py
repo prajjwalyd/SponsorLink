@@ -7,30 +7,39 @@ from app import db
 bp = Blueprint('ad_request', __name__)
 
 
-@bp.route('/ad_request/new', methods=['GET', 'POST'])
+@bp.route('/ad_request/new/<int:campaign_id>', methods=['GET', 'POST'])
 @login_required
-def create_ad_request():
+def create_ad_request(campaign_id):
     if current_user.role != 'sponsor':
         flash('Access unauthorized!', 'danger')
         return redirect(url_for('auth.home'))
+
+    # Check if the campaign belongs to the current user
+    campaign = Campaign.query.get_or_404(campaign_id)
+    if campaign.owner_id != current_user.id:
+        flash('Access unauthorized!', 'danger')
+        return redirect(url_for('auth.home'))
+
     form = AdRequestForm()
-    form.campaign_id.choices = [(campaign.id, campaign.name) for campaign in current_user.campaigns]
+    form.campaign_id.choices = [(campaign.id, campaign.name)]  # Pre-select the campaign
+    form.campaign_id.data = campaign.id  # Pre-set the campaign ID
     form.influencer_id.choices = [(influencer.id, influencer.username) for influencer in User.query.filter_by(role='influencer').all()]
+
     if form.validate_on_submit():
         ad_request = AdRequest(
-            campaign_id=form.campaign_id.data,
+            campaign_id=campaign.id,
             influencer_id=form.influencer_id.data,
-            name = form.name.data,
+            name=form.name.data,
             requirements=form.requirements.data,
             payment_amount=form.payment_amount.data,
-            # status=form.status.data
         )
         db.session.add(ad_request)
         db.session.commit()
         flash('Ad request created successfully!', 'success')
         return redirect(url_for('user.sponsor_dashboard'))
-    return render_template('create_ad_request.html', form=form)
 
+    return render_template('create_ad_request.html', form=form)
+    
 @bp.route('/ad_request/<int:ad_request_id>/update', methods=['GET', 'POST'])
 @login_required
 def update_ad_request(ad_request_id):

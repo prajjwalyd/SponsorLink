@@ -30,7 +30,6 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
-# Campaign model
 class Campaign(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -47,14 +46,13 @@ class Campaign(db.Model):
     def __repr__(self):
         return f'<Campaign {self.name}>'
 
-# AdRequest model
 class AdRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id', ondelete='CASCADE'), nullable=False)
     influencer_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     requirements = db.Column(db.Text)
-    payment_amount = db.Column(db.Integer)
+    payment_amount = db.Column(db.Float, nullable=False)
     negotiation_comment = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), nullable=False, default='Requested')
     flagged = db.Column(db.Boolean, default=False)
